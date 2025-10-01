@@ -21,7 +21,7 @@ tmux set -g status-left "#[fg=${PALETTE[bg]},bg=${PALETTE[green]},bold] #S #[fg=
 tmux set -g status-right "#{prefix_highlight}#[fg=${PALETTE[bg_highlight]},bg=${PALETTE[bg]},nobold,noitalics,nounderscore]#[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}] ${DATE_FORMAT} #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore]#[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}] ${TIME_FORMAT} #[fg=${PALETTE[green]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore]#[fg=${PALETTE[bg]},bg=${PALETTE[green]},bold] #H "
 
 #+--- Windows ---+
-tmux set -g window-status-format "#[fg=${PALETTE[bg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}]#I #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}]#W #F #[fg=${PALETTE[bg_highlight]},bg=${PALETTE[bg]},nobold,noitalics,nounderscore]"
+tmux set -g window-status-format "#[fg=${PALETTE[bg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}]#I #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}]#W #F #[fg=${PALETTE[bg_highlight]},bg=${PALETTE[bg]},nobold,noitalics,nounderscore]"
 tmux set -g window-status-current-format "#[fg=${PALETTE[bg]},bg=${PALETTE[rose]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[rose]}]#I #[fg=${PALETTE[bg]},bg=${PALETTE[rose]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[rose]}]#W #F #[fg=${PALETTE[rose]},bg=${PALETTE[bg]},nobold,noitalics,nounderscore]"
 tmux set -g window-status-separator ""
 
