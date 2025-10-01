@@ -10,9 +10,9 @@ TIME_FORMAT=${TIME_FORMAT:-"%H:%M"}
 #+ Plugin Support +
 #+----------------+
 #+--- tmux-prefix-highlight ---+
-tmux set -g @prefix_highlight_output_prefix "#[fg=${PALETTE[green]}]#[bg=${PALETTE[bg]}]#[nobold]#[noitalics]#[nounderscore]#[bg=${PALETTE[green]}]#[fg=${PALETTE[bg]}]"
+tmux set -g @prefix_highlight_output_prefix "#[fg=${PALETTE[aqua]}]#[bg=${PALETTE[bg]}]#[nobold]#[noitalics]#[nounderscore]#[bg=${PALETTE[aqua]}]#[fg=${PALETTE[bg]}]"
 tmux set -g @prefix_highlight_output_suffix ""
-tmux set -g @prefix_highlight_copy_mode_attr "fg=${PALETTE[green]},bg=${PALETTE[bg]},bold"
+tmux set -g @prefix_highlight_copy_mode_attr "fg=${PALETTE[aqua]},bg=${PALETTE[bg]},bold"
 
 #+--------+
 #+ Status +  
