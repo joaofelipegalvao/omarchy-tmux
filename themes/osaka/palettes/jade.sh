@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Osaka Jade Palette
+# Based on: https://github.com/craftzdog/dotfiles-public
+declare -A PALETTE=(
+  [none]="NONE"
+  [bg]="#111c18"
+  [bg_dark]="#0d1512"
+  [bg_highlight]="#23372B"
+  [fg]="#C1C497"
+  [fg_dark]="#a8af7e"
+  [fg_bright]="#F6F5DD"
+  [cursor]="#D7C995"
+  [black]="#23372B"
+  [red]="#FF5345"
+  [green]="#549e6a"
+  [yellow]="#459451"
+  [blue]="#509475"
+  [magenta]="#D2689C"
+  [cyan]="#2DD5B7"
+  [white]="#F6F5DD"
+  [bright_black]="#53685B"
+  [bright_red]="#db9f9c"
+  [bright_green]="#9eebb3"
+  [bright_yellow]="#E5C736"
+  [bright_blue]="#ACD4CF"
+  [bright_magenta]="#75bbb3"
+  [bright_cyan]="#8CD3CB"
+  [bright_white]="#9eebb3"
+  [dark_green]="#143614"
+  [teal]="#75bbb3"
+  [aqua]="#8CD3CB"
+  [jade]="#2DD5B7"
+  [lime]="#549e6a"
+  [olive]="#459451"
+  [pink]="#D2689C"
+  [orange]="#FF5345"
+  [terminal_black]="#53685B"
+  [fg_gutter]="#23372B"
+  [comment]="#53685B"
+  [purple]="#75bbb3"
+  [git_add]="#549e6a"
+  [git_change]="#E5C736"
+  [git_delete]="#FF5345"
+)
+
+export PALETTE
