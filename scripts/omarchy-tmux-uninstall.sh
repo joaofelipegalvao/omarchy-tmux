@@ -52,7 +52,7 @@ confirm() {
   [[ $FORCE -eq 1 ]] && return 0
 
   local prompt="$1"
-  read -rp "$prompt [y/N] " response
+  read -rp "$prompt [y/N] " response </dev/tty
   [[ $response =~ ^[Yy]$ ]]
 }
 
