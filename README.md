@@ -10,6 +10,9 @@
     <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/HOW_IT_WORKS.md" target="_blank">
     <img src="https://img.shields.io/badge/How_It-Works-7aa2f7?style=flat-square&labelColor=1a1b26&logo=readthedocs&logoColor=c0caf5"/>
   </a>
+  <a href="https://github.com/joaofelipegalvao/omarchy-tmux/releases" target="_blank">
+    <img src="https://img.shields.io/github/v/release/joaofelipegalvao/omarchy-tmux?style=flat-square&labelColor=1a1b26&color=7aa2f7&logo=github&logoColor=c0caf5"/>
+  </a>
 
 </p>
 
