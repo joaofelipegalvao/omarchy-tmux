@@ -4,7 +4,7 @@
 
 set -uo pipefail
 
-readonly VERSION="1.0.1"
+readonly VERSION="1.0.0"
 readonly INSTALL_DIR="$HOME/.config/tmux/plugins/omarchy-tmux"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 readonly MONITOR_SCRIPT="$HOME/.local/bin/omarchy-tmux-monitor"
