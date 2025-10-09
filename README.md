@@ -4,6 +4,9 @@
   <a href="https://omarchy.org" target="_blank">
     <img src="https://img.shields.io/badge/Omarchy-Compatible-7aa2f7?style=flat-square&labelColor=1a1b26&logo=archlinux&logoColor=c0caf5"/>
   </a>
+  <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/badge/License-MIT-7aa2f7?style=flat-square&labelColor=1a1b26&logo=github&logoColor=c0caf5"/>
+  </a>
   <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/INSTALL.md" target="_blank">
     <img src="https://img.shields.io/badge/Installation-Guide-7aa2f7?style=flat-square&labelColor=1a1b26&logo=tmux&logoColor=c0caf5"/>
   </a>
