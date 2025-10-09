@@ -21,12 +21,11 @@
 
 <div align="center">
   
-<p align="center"><em>Tmux themes that automatically sync with <a href="https://omarchy.org">Omarchy</a> theme changes.</em></p>
+Tmux themes that automatically sync with <a href="https://omarchy.org">Omarchy</a> theme changes.
 
 ![Demo](assets/demo.gif)
 
-Watch how tmux automatically updates when switching Omarchy themes with `Super + Ctrl + Shift + Space`
-</div>
+<p align="center"><em>Watch how tmux automatically updates when switching Omarchy themes with <code>Super + Ctrl + Shift + Space</code></em></p></div>
 
 ## Features
 
