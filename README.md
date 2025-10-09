@@ -158,8 +158,8 @@ Each contains:
 
 ```bash
 set -g @plugin 'joaofelipegalvao/omarchy-tmux'
-set -g @theme 'teme exemple'
-set -g @theme_variant 'variant exemple'
+set -g @theme 'teme example'
+set -g @theme_variant 'variant example'
 set -g @theme_no_patched_font '0'
 ```
 
