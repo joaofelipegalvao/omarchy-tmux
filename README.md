@@ -21,7 +21,7 @@
 
 <div align="center">
   
-Tmux themes that automatically sync with [Omarchy](https://omarchy.org) theme changes.
+<p align="center"><em>Tmux themes that automatically sync with <a href="https://omarchy.org">Omarchy</a> theme changes.</em></p>
 
 ![Demo](assets/demo.gif)
 
