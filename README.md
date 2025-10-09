@@ -44,11 +44,18 @@ Then inside tmux, press `prefix + I` (Ctrl+b Shift+i) to install plugins.
 
 ### Disable Icons
 
+If you don't have a Nerd Font installed, you can disable icons.
+
 Edit `~/.config/omarchy/themes/[theme]/tmux.conf`:
 
 ```bash
 set -g @theme_no_patched_font '1'
 ```
+
+**Example without icons:**
+
+[![No icons preview](https://i.postimg.cc/5yn1ndYg/screenshot-2025-10-09-19-41-44.png)](https://postimg.cc/PvpB57Mv)
+
 
 ### Manual Reload
 
