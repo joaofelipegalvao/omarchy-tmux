@@ -34,7 +34,7 @@ sudo pacman -S tmux inotify-tools git
 ### 2. Install TPM
 
 ```bash
-git clone <https://github.com/tmux-plugins/tpm> ~/.tmux/plugins/tpm
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ```
 
 ### 3. Clone the plugin
