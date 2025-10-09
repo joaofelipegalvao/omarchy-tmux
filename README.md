@@ -86,22 +86,6 @@ curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/
 - `inotify-tools` (for auto-reload)
 - `git`
 
-## Themes
-
-| Theme | Preview |
-|-------|---------|
-| Tokyo Night | [![screenshot-2025-10-09-11-24-07.png](https://i.postimg.cc/grFdDnRn/screenshot-2025-10-09-11-24-07.png)](https://postimg.cc/8fHqkkZS) |
-| Catppuccin | [![screenshot-2025-10-09-11-25-59.png](https://i.postimg.cc/0jg2tW1M/screenshot-2025-10-09-11-25-59.png)](https://postimg.cc/KkN2j5zx) |
-| Catppuccin Latte | [![screenshot-2025-10-09-11-26-59.png](https://i.postimg.cc/9f6hVD8D/screenshot-2025-10-09-11-26-59.png)](https://postimg.cc/KKDVD8yb) |
-| Everforest | [![screenshot-2025-10-09-11-27-58.png](https://i.postimg.cc/mDf0J0kX/screenshot-2025-10-09-11-27-58.png)](https://postimg.cc/3y1SDfgm) |
-| Gruvbox | [![screenshot-2025-10-09-11-29-01.png](https://i.postimg.cc/fRSqsB6j/screenshot-2025-10-09-11-29-01.png)](https://postimg.cc/Jsm5cc7G) |
-| Kanagawa | [![screenshot-2025-10-09-11-29-39.png](https://i.postimg.cc/CLzmCcLZ/screenshot-2025-10-09-11-29-39.png)](https://postimg.cc/VdPqmBt1) |
-| Matte Black | [![screenshot-2025-10-09-11-30-21.png](https://i.postimg.cc/v8Svm5LF/screenshot-2025-10-09-11-30-21.png)](https://postimg.cc/Cdk8PBQm) |
-| Nord | [![screenshot-2025-10-09-11-30-55.png](https://i.postimg.cc/V6kjfNJ6/screenshot-2025-10-09-11-30-55.png)](https://postimg.cc/v1C1XbLF) |
-| Osaka Jade | [![screenshot-2025-10-09-11-31-54.png](https://i.postimg.cc/MTLjzm2w/screenshot-2025-10-09-11-31-54.png)](https://postimg.cc/5Ywt3v2K)|
-| Ristretto | [![screenshot-2025-10-09-11-32-51.png](https://i.postimg.cc/C5DCtQZ7/screenshot-2025-10-09-11-32-51.png)](https://postimg.cc/bSy2SL9S) |
-| Rose Pine | [![screenshot-2025-10-09-11-33-22.png](https://i.postimg.cc/sXG5QN4b/screenshot-2025-10-09-11-33-22.png)](https://postimg.cc/KkF1CQV5) |
-
 ## Configuration
 
 ### Disable Icons
@@ -177,28 +161,6 @@ set -g @plugin 'joaofelipegalvao/omarchy-tmux'
 set -g @theme 'teme exemple'
 set -g @theme_variant 'variant exemple'
 set -g @theme_no_patched_font '0'
-```
-
-## Project Structure
-
-```
-omarchy-tmux/
-├── scripts/
-│   ├── omarchy-tmux-install.sh      # Installation script
-│   └── omarchy-tmux-uninstall.sh    # Uninstallation script
-├── themes/
-│   ├── catppuccin/
-│   │   ├── palettes/
-│   │   │   ├── latte.sh
-│   │   │   └── macchiato.sh
-│   │   ├── status.sh                # With icons
-│   │   ├── status-no-icons.sh       # Without icons
-│   │   └── theme.sh                 # Base theme
-│   ├── tokyo-night/
-│   ├── everforest/
-│   └── ...                          # Other themes
-├── tmux-themes.tmux                 # TPM plugin loader
-└── README.md
 ```
 
 ## Contributing
