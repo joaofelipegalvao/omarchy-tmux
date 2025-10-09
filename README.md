@@ -80,11 +80,10 @@ curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/
 
 ## Requirements
 
-- [Omarchy](https://omarchy.org) v3.0+
-- tmux 3.0+
+- [Omarchy](https://omarchy.org)
+- [Tmux](https://github.com/tmux/tmux/wiki)
 - [TPM](https://github.com/tmux-plugins/tpm)
 - `inotify-tools` (for auto-reload)
-- `git`
 
 ## Configuration
 
@@ -158,8 +157,8 @@ Each contains:
 
 ```bash
 set -g @plugin 'joaofelipegalvao/omarchy-tmux'
-set -g @theme 'teme example'
-set -g @theme_variant 'variant example'
+set -g @theme 'tokyo-night'
+set -g @theme_variant 'night'
 set -g @theme_no_patched_font '0'
 ```
 
