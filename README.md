@@ -73,7 +73,7 @@ set -g @theme_no_patched_font '1'
 
 **Example without icons:**
 
-[![No icons preview](https://i.postimg.cc/5yn1ndYg/screenshot-2025-10-09-19-41-44.png)](https://postimg.cc/PvpB57Mv)
+[![No icons preview](https://i.postimg.cc/WzZnKGS0/screenshot-2025-10-10-09-17-19.png)](https://postimg.cc/8f1Mfr2C)
 
 
 ### Manual Reload
