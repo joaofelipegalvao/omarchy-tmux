@@ -99,7 +99,7 @@ Contributions are welcome! Please:
 
 ## Acknowledgments
 
-- [Omarchy](https://omarchy.org) - The beautiful Arch Linux distribution
+- Thanks @dhh for [Omarchy](https://omarchy.org)
 - [TPM](https://github.com/tmux-plugins/tpm) - Tmux Plugin Manager
 - Community theme creators
 
