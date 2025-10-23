@@ -9,7 +9,7 @@ readonly INSTALL_DIR="$HOME/.config/tmux/plugins/omarchy-tmux"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 readonly THEMES_DIR="$HOME/.config/omarchy/themes"
 readonly UPDATE_SCRIPT="$HOME/.local/bin/omarchy-tmux-hook"
-readonly HOOK_FILE="$HOME/.config/omarchy/theme-set"
+readonly HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set"
 
 QUIET=0
 FORCE=0
