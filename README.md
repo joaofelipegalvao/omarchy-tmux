@@ -50,7 +50,6 @@ Then inside tmux, press `prefix + I` (Ctrl+b Shift+i) to install plugins.
 - [Omarchy](https://omarchy.org)
 - [Tmux](https://github.com/tmux/tmux/wiki)
 - [TPM](https://github.com/tmux-plugins/tpm)
-- `inotify-tools` (for auto-reload)
 - `systemd --user` support
 
 ## Documentation

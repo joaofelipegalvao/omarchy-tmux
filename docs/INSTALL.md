@@ -7,7 +7,6 @@ This document explains all installation methods for **Omarchy Tmux**.
 - [Omarchy](https://omarchy.org)
 - [Tmux](https://github.com/tmux/tmux/wiki)
 - [TPM](https://github.com/tmux-plugins/tpm)
-- `inotify-tools`
 - `systemd --user` support (for auto-reload)
 
 ## Quick Install (Recommended)
@@ -28,7 +27,7 @@ bash ~/.config/tmux/plugins/omarchy-tmux/scripts/omarchy-tmux-install.sh
 ### 1. Install Dependencies
 
 ```bash
-sudo pacman -S tmux inotify-tools git
+sudo pacman -S tmux git
 ```
 
 ### 2. Install TPM

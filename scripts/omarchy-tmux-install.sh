@@ -67,7 +67,6 @@ check_deps() {
 
 
   command -v tmux >/dev/null 2>&1 || missing+=("tmux")
-  command -v inotifywait >/dev/null 2>&1 || missing+=("inotify-tools")
   command -v git >/dev/null 2>&1 || missing+=("git")
 
   if [[ ${#missing[@]} -gt 0 ]]; then
