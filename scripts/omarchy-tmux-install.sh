@@ -334,6 +334,8 @@ EOF
 }
 
 install_update_script() {
+  # Ensure the dir exists
+  mkdir -p $(dirname $UPDATE_SCRIPT)
   cat >"$UPDATE_SCRIPT" <<'SCRIPT'
 #!/bin/bash
 set -euo pipefail
