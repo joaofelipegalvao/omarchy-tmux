@@ -59,23 +59,6 @@ run '~/.tmux/plugins/tpm/tpm'
 
 Inside tmux, press `prefix + I` (Ctrl+b Shift+i)
 
-### 6. Setup Auto-reload (Optional)
-
-The installer automatically creates and enables a systemd service for auto-reload.
-
-To manually check or restart:
-
-```bash
-# Check status
-systemctl --user status omarchy-tmux-monitor
-
-# Restart
-systemctl --user restart omarchy-tmux-monitor
-
-# View logs
-journalctl --user -u omarchy-tmux-monitor -f
-```
-
 ### Disable Icons
 
 Edit theme config in `~/.config/omarchy/themes/[theme]/tmux.conf`:
