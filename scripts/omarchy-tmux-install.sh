@@ -8,8 +8,8 @@ readonly VERSION="1.0.0"
 readonly REPO="https://github.com/joaofelipegalvao/omarchy-tmux.git"
 readonly INSTALL_DIR="$HOME/.config/tmux/plugins/omarchy-tmux"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
-readonly MONITOR_SCRIPT="$HOME/.local/bin/omarchy-tmux-monitor"
-readonly SYSTEMD_SERVICE="$HOME/.config/systemd/user/omarchy-tmux-monitor.service"
+readonly UPDATE_SCRIPT="$HOME/.local/bin/omarchy-tmux-hook"
+readonly HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set"
 readonly OMARCHY_DIR="$HOME/.config/omarchy"
 readonly THEMES_DIR="$OMARCHY_DIR/themes"
 
@@ -61,8 +61,12 @@ check_deps() {
     error "Omarchy not found at $OMARCHY_DIR"
   fi
 
+  if [[ ! -d "$(dirname $HOOK_FILE)" ]]; then
+    error "Omarchy hook directory not found, version 3.1 is required"
+  fi
+
+
   command -v tmux >/dev/null 2>&1 || missing+=("tmux")
-  command -v inotifywait >/dev/null 2>&1 || missing+=("inotify-tools")
   command -v git >/dev/null 2>&1 || missing+=("git")
 
   if [[ ${#missing[@]} -gt 0 ]]; then
@@ -121,6 +125,22 @@ install_plugin() {
     if ! git clone --quiet --depth 1 "$REPO" "$INSTALL_DIR" 2>&1; then
       error "Clone failed"
     fi
+  fi
+}
+
+install_hook() {
+  if [[ -f "$HOOK_FILE" ]]; then
+    # If the hook isn't enabled, first attempt to rename it from the sample
+    if [[ -f "${HOOK_FILE}.sample" ]]; then
+      mv "${HOOK_FILE}.sample" "${HOOK_FILE}"
+    # Otherwise, add an empty bash script
+    else
+      echo '#!/bin/bash' > $HOOK_FILE
+    fi
+  fi
+
+  if ! grep -q 'omarchy-tmux-hook' $HOOK_FILE; then
+    echo "$UPDATE_SCRIPT \$1" >> $HOOK_FILE
   fi
 }
 
@@ -313,60 +333,31 @@ EOF
   log "Configured tmux.conf"
 }
 
-install_monitor() {
-  mkdir -p "$(dirname "$MONITOR_SCRIPT")"
-
-  cat >"$MONITOR_SCRIPT" <<'SCRIPT'
+install_update_script() {
+  # Ensure the dir exists
+  mkdir -p $(dirname $UPDATE_SCRIPT)
+  cat >"$UPDATE_SCRIPT" <<'SCRIPT'
 #!/bin/bash
 set -euo pipefail
 
-readonly THEME_LINK="$HOME/.config/omarchy/current/theme"
-readonly THEME_DIR="$(dirname "$THEME_LINK")"
+readonly THEME="$1"
+readonly THEME_DIR="$HOME/.config/omarchy/themes/$THEME"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 readonly LOCKFILE="$HOME/.cache/omarchy-tmux.lock"
-
-mkdir -p "$(dirname "$LOCKFILE")"
-
-# Enhanced lockfile handling with stale detection
-if [[ -e "$LOCKFILE" ]]; then
-  lock_pid=$(cat "$LOCKFILE" 2>/dev/null || echo "")
-  
-  if [[ -n "$lock_pid" ]] && kill -0 "$lock_pid" 2>/dev/null; then
-    # Check if lockfile is stale (older than 1 hour)
-    lock_age=$(($(date +%s) - $(stat -c %Y "$LOCKFILE" 2>/dev/null || echo 0)))
-    if [[ $lock_age -lt 3600 ]]; then
-      exit 0
-    fi
-    echo "Warning: Removing stale lockfile (age: ${lock_age}s)" >&2
-  fi
-  rm -f "$LOCKFILE"
-fi
-
-echo $ >"$LOCKFILE"
-trap 'rm -f "$LOCKFILE"; pkill -P $ 2>/dev/null || true' EXIT INT TERM
 
 reload_tmux() {
   if ! tmux list-sessions &>/dev/null; then
     return
   fi
-  
+
   local pane_count
   pane_count=$(tmux list-panes -a 2>/dev/null | wc -l || echo "0")
-  
+
   if [[ $pane_count -gt 0 ]]; then
     tmux source-file "$TMUX_CONF" &>/dev/null || true
     tmux refresh-client -S &>/dev/null || true
   fi
 }
-
-# Validate theme link exists
-if [[ ! -L "$THEME_LINK" ]]; then
-  sleep 5  # Wait for Omarchy to create the symlink
-  if [[ ! -L "$THEME_LINK" ]]; then
-    echo "Error: Theme symlink not found at $THEME_LINK" >&2
-    exit 1
-  fi
-fi
 
 # Validate theme directory exists
 if [[ ! -d "$THEME_DIR" ]]; then
@@ -374,68 +365,17 @@ if [[ ! -d "$THEME_DIR" ]]; then
   exit 1
 fi
 
-LAST=$(readlink "$THEME_LINK" 2>/dev/null || echo "")
+# Verify directory still exists
+if [[ ! -d "$THEME_DIR" ]]; then
+  echo "Warning: Theme directory disappeared, exiting" >&2
+  exit 1
+fi
 
-while IFS= read -r event; do
-  [[ "$event" != "theme" ]] && continue
-  
-  CURRENT=$(readlink "$THEME_LINK" 2>/dev/null || echo "")
-  
-  if [[ "$CURRENT" != "$LAST" ]]; then
-    sleep 0.2
-    reload_tmux
-    LAST="$CURRENT"
-  fi
-  
-  # Verify directory still exists
-  if [[ ! -d "$THEME_DIR" ]]; then
-    echo "Warning: Theme directory disappeared, exiting" >&2
-    exit 1
-  fi
-done < <(inotifywait -m -q -e create,delete,moved_to --format '%f' --timeout 86400 "$THEME_DIR" 2>&1)
-
-# If we reach here, timeout occurred - restart monitoring
-exec "$0"
+reload_tmux
 SCRIPT
 
-  chmod +x "$MONITOR_SCRIPT"
+  chmod +x "$UPDATE_SCRIPT"
   log "Created monitor script"
-}
-
-setup_service() {
-  mkdir -p "$(dirname "$SYSTEMD_SERVICE")"
-
-  cat >"$SYSTEMD_SERVICE" <<EOF
-[Unit]
-Description=Omarchy Tmux Monitor
-After=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=$MONITOR_SCRIPT
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=default.target
-EOF
-
-  if ! command -v systemctl >/dev/null 2>&1; then
-    warn "systemctl not found. Run monitor manually: $MONITOR_SCRIPT &"
-    return
-  fi
-
-  systemctl --user daemon-reload 2>&1 || warn "Failed to reload systemd"
-  systemctl --user enable omarchy-tmux-monitor.service 2>&1 || warn "Failed to enable service"
-  systemctl --user restart omarchy-tmux-monitor.service 2>&1 || warn "Failed to start service"
-
-  sleep 1
-
-  if systemctl --user is-active --quiet omarchy-tmux-monitor.service 2>/dev/null; then
-    log "Service enabled and running"
-  else
-    warn "Service not running. Check: systemctl --user status omarchy-tmux-monitor"
-  fi
 }
 
 main() {
@@ -467,8 +407,8 @@ main() {
   install_plugin
   generate_theme_configs
   configure_tmux
-  install_monitor
-  setup_service
+  install_update_script
+  install_hook
 
   if [[ $QUIET -eq 0 ]]; then
     echo -e "\n${GREEN}╔════════════════════════════════════════╗${NC}"

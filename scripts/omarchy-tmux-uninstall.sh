@@ -7,9 +7,9 @@ set -uo pipefail
 readonly VERSION="1.0.0"
 readonly INSTALL_DIR="$HOME/.config/tmux/plugins/omarchy-tmux"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
-readonly MONITOR_SCRIPT="$HOME/.local/bin/omarchy-tmux-monitor"
-readonly SYSTEMD_SERVICE="$HOME/.config/systemd/user/omarchy-tmux-monitor.service"
 readonly THEMES_DIR="$HOME/.config/omarchy/themes"
+readonly UPDATE_SCRIPT="$HOME/.local/bin/omarchy-tmux-hook"
+readonly HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set"
 
 QUIET=0
 FORCE=0
@@ -54,48 +54,6 @@ confirm() {
   local prompt="$1"
   read -rp "$prompt [y/N] " response </dev/tty
   [[ $response =~ ^[Yy]$ ]]
-}
-
-stop_service() {
-
-  if ! command -v systemctl >/dev/null 2>&1; then
-    warn "systemctl not found, skipping service management."
-    return
-  fi
-
-  log "Stopping Omarchy Tmux Monitor service..."
-  timeout 2 systemctl --user stop omarchy-tmux-monitor.service 2>/dev/null || true
-  log "Disabling Omarchy Tmux Monitor service..."
-  timeout 2 systemctl --user disable omarchy-tmux-monitor.service 2>/dev/null || true
-
-  if [[ -f "$SYSTEMD_SERVICE" ]]; then
-    log "Removing Systemd service file..."
-    rm -f "$SYSTEMD_SERVICE"
-    timeout 2 systemctl --user daemon-reload 2>/dev/null || true
-  fi
-}
-
-remove_monitor() {
-  if [[ -f "$MONITOR_SCRIPT" ]]; then
-    log "Removing monitor script..."
-    rm -f "$MONITOR_SCRIPT"
-  else
-    [[ $QUIET -eq 0 ]] && info "Monitor script not found, skipping."
-  fi
-
-  # Remove lockfile
-  local lockfile="$HOME/.cache/omarchy-tmux.lock"
-  if [[ -f "$lockfile" ]]; then
-    log "Removing monitor lockfile..."
-    rm -f "$lockfile"
-  fi
-
-  # Remove log file
-  local logfile="$HOME/.cache/omarchy-tmux-monitor.log"
-  if [[ -f "$logfile" ]]; then
-    log "Removing monitor logfile..."
-    rm -f "$logfile"
-  fi
 }
 
 remove_plugin() {
@@ -179,6 +137,16 @@ remove_theme_configs() {
   fi
 }
 
+remove_hook() {
+  if [[ -f "$HOOK_FILE" ]]; then
+    sed -i '/omarchy-tmux-hook/d' "$HOOK_FILE"
+  fi
+
+  if [[ -f "$UPDATE_SCRIPT" ]]; then
+    rm $UPDATE_SCRIPT
+  fi
+}
+
 reload_tmux() {
   [[ $QUIET -eq 1 ]] && return
 
@@ -188,7 +156,7 @@ reload_tmux() {
   fi
 
   if tmux list-sessions &>/dev/null; then
-    if [[ -n "$TMUX" ]]; then
+    if [[ -n "${TMUX-}" ]]; then
       info "Inside tmux session: please restart tmux manually to apply changes"
       echo -e "  Run: ${CYAN}tmux kill-server${NC} then ${CYAN}tmux${NC}"
     else
@@ -213,8 +181,7 @@ show_summary() {
 
   echo -e "\n${GREEN}Removed:${NC}"
   [[ ! -d "$INSTALL_DIR" ]] && echo "  ✓ Omarchy Tmux plugin"
-  [[ ! -f "$MONITOR_SCRIPT" ]] && echo "  ✓ Monitor script"
-  [[ ! -f "$SYSTEMD_SERVICE" ]] && echo "  ✓ Systemd service"
+  [[ ! -f "$UPDATE_SCRIPT" ]] && echo "  ✓ Update hook"
   echo "  ✓ Tmux.conf integration"
 
   echo -e "\n${BLUE}Next steps:${NC}"
@@ -254,7 +221,6 @@ main() {
   if [[ $FORCE -eq 0 ]]; then
     echo "This will attempt to remove the following components:"
     echo "  • Omarchy Tmux plugin"
-    echo "  • Theme monitor service"
     echo "  • Monitor script"
     [[ $KEEP_CONFIGS -eq 0 ]] && echo "  • Theme configs and empty theme directories (use -k to keep configs)"
     echo "  • Omarchy Tmux integration from tmux.conf"
@@ -266,9 +232,8 @@ main() {
     fi
   fi
 
-  stop_service
-  remove_monitor
   remove_plugin
+  remove_hook
   clean_tmux_conf
   remove_theme_configs
   reload_tmux

@@ -6,7 +6,8 @@ Understanding how **Omarchy Tmux** integrates with your system.
 
 Omarchy Tmux automatically reloads tmux when you change your Omarchy theme.
 
-When the Omarchy theme symlink updates, a lightweight monitor detects it and triggers a tmux reload.
+When the Omarchy sets the theme, it calls an installed hook which triggers
+a tmux reload.
 
 ## Architecture
 
@@ -19,22 +20,12 @@ Each theme (e.g., `tokyo-night`, `catppuccin`) contains a `tmux.conf` generated 
 `tmux-themes.tmux` acts as the TPM entry point.  
 It loads the theme defined in the current Omarchy configuration.
 
-### 3. Systemd Monitor
+### 3. Omarchy Hook
 
-The installer adds a user service:
+The installer adds a hook to ~/.config/omarchy/hooks/theme-set which
+gets called whenever the theme changes.
 
-```
-omarchy-tmux-monitor.service
-```
-
-which watches:
-
-```
-~/.config/omarchy/current/theme
-```
-
-and runs:
-
+This hook runs:
 ```bash
 tmux source-file ~/.config/tmux/tmux.conf
 ```
@@ -63,21 +54,6 @@ set -g @theme_variant 'night'
 set -g @theme_no_patched_font '0'
 ```
 
-## Service Overview
-
-```bash
-# Check status
-systemctl --user status omarchy-tmux-monitor
-
-# Restart service
-systemctl --user restart omarchy-tmux-monitor
-
-# View logs
-journalctl --user -u omarchy-tmux-monitor -f
-```
-
-The monitor is lightweight and runs only when the user session is active.
-
 ## Flow Diagram
 
 ```
@@ -87,19 +63,18 @@ The monitor is lightweight and runs only when the user session is active.
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Omarchy updates symlink:                                   │
-│  ~/.config/omarchy/current/theme → new-theme                │
+│  Omarchy calls hooks:                                       │
+│  ~/.config/omarchy/hooks/theme-set <new-theme>              │
 └───────────────────────┬─────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  inotifywait detects change                                 │
-│  (via omarchy-tmux-monitor.service)                         │
+│ Installed hook in ~/.local/bin/omarchy-tmux-hook is called  │
 └───────────────────────┬─────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Monitor script triggers:                                   │
+│  Hook triggers:                                             │
 │  tmux source-file ~/.config/tmux/tmux.conf                  │
 └───────────────────────┬─────────────────────────────────────┘
                         │
