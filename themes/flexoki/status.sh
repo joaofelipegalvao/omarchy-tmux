@@ -22,10 +22,10 @@ tmux set -g @prefix_highlight_copy_mode_attr "fg=${PALETTE[cyan]},bg=${PALETTE[b
 #+ Status +  
 #+--------+
 #+--- Bars ---+
-tmux set -g status-left "#[fg=${PALETTE[bg]},bg=${PALETTE[green]},bold] 󰌌 #S #[fg=${PALETTE[green]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
+tmux set -g status-left "#[fg=${PALETTE[bg1]},bg=${PALETTE[green]},bold] 󰌌 #S #[fg=${PALETTE[green]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
 tmux set -g status-right "#{prefix_highlight}#[fg=${PALETTE[bg_highlight]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]#[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}] 󰃭 ${DATE_FORMAT} #[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore]#[fg=${PALETTE[fg]},bg=${PALETTE[bg_highlight]}] 󰥔 ${TIME_FORMAT} #[fg=${PALETTE[cyan]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore]#[fg=${PALETTE[bg]},bg=${PALETTE[cyan]},bold] #H "
 
 #+--- Windows ---+
-tmux set -g window-status-format "#[fg=${PALETTE[bg]},bg=${PALETTE[cyan]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]}]#I #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]}]#W #F #[fg=${PALETTE[cyan]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
-tmux set -g window-status-current-format "#[fg=${PALETTE[bg1]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore] #[fg=${PALETTE[cyan_2]},bg=${PALETTE[bg5]}]#I #[fg=${PALETTE[cyan_2]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore] #[fg=${PALETTE[cyan_2]},bg=${PALETTE[bg5]}]#W #F #[fg=${PALETTE[bg5]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
+tmux set -g window-status-format "#[fg=${PALETTE[bg1]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[cyan]},bg=${PALETTE[bg_highlight]}]#I #[fg=${PALETTE[cyan]},bg=${PALETTE[bg_highlight]},nobold,noitalics,nounderscore] #[fg=${PALETTE[cyan]},bg=${PALETTE[bg_highlight]}]#W #F #[fg=${PALETTE[bg_highlight]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
+tmux set -g window-status-current-format "#[fg=${PALETTE[bg1]},bg=${PALETTE[cyan]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]}]#I #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[cyan]}]#W #F #[fg=${PALETTE[cyan]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
 tmux set -g window-status-separator ""
