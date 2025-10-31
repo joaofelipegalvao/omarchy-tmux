@@ -187,6 +187,11 @@ detect_theme_config() {
     variant="jade"
     ;;
 
+  flexoki-light)
+    base="flexoki"
+    variant="light"
+    ;;
+
   matte-black | nord | ristretto)
     base="$theme"
     variant="$theme"
