@@ -29,7 +29,7 @@ Tmux themes that automatically sync with <a href="https://omarchy.org">Omarchy</
 
 ## Features
 
-- All 11 Omarchy themes supported
+- All 12 Omarchy themes supported
 - Automatic theme synchronization
 - Optional Nerd Font icons
 - TPM compatible
