@@ -27,5 +27,5 @@ tmux set -g status-right "#{prefix_highlight}#[fg=${PALETTE[bg_highlight]},bg=${
 
 #+--- Windows ---+
 tmux set -g window-status-format "#[fg=${PALETTE[bg]},bg=${PALETTE[green]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[green]}]#I #[fg=${PALETTE[bg]},bg=${PALETTE[green]},nobold,noitalics,nounderscore] #[fg=${PALETTE[bg]},bg=${PALETTE[green]}]#W #F #[fg=${PALETTE[green]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
-tmux set -g window-status-current-format "#[fg=${PALETTE[bg1]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore] #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]}]#I #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore]] #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]}]#W #F #[fg=${PALETTE[bg5]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
+tmux set -g window-status-current-format "#[fg=${PALETTE[bg1]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore] #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]}]#I #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]},nobold,noitalics,nounderscore] #[fg=${PALETTE[green_2]},bg=${PALETTE[bg5]}]#W #F #[fg=${PALETTE[bg5]},bg=${PALETTE[bg1]},nobold,noitalics,nounderscore]"
 tmux set -g window-status-separator ""
