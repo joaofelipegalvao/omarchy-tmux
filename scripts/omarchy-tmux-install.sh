@@ -65,7 +65,6 @@ check_deps() {
     error "Omarchy hook directory not found, version 3.1 is required"
   fi
 
-
   command -v tmux >/dev/null 2>&1 || missing+=("tmux")
   command -v git >/dev/null 2>&1 || missing+=("git")
 
@@ -135,12 +134,12 @@ install_hook() {
       mv "${HOOK_FILE}.sample" "${HOOK_FILE}"
     # Otherwise, add an empty bash script
     else
-      echo '#!/bin/bash' > $HOOK_FILE
+      echo '#!/bin/bash' >$HOOK_FILE
     fi
   fi
 
   if ! grep -q 'omarchy-tmux-hook' $HOOK_FILE; then
-    echo "$UPDATE_SCRIPT \$1" >> $HOOK_FILE
+    echo "$UPDATE_SCRIPT \$1" >>$HOOK_FILE
   fi
 }
 
@@ -190,6 +189,16 @@ detect_theme_config() {
   flexoki-light)
     base="flexoki"
     variant="light"
+    ;;
+
+  ethereal)
+    base="ethereal"
+    variant="ethereal"
+    ;;
+
+  hackerman)
+    base="hackerman"
+    variant="hackerman"
     ;;
 
   matte-black | nord | ristretto)
