@@ -111,7 +111,7 @@ tmux
 
 ```bash
 # Re-run installer
-bash install.sh -f
+bash omarchy-tmux-install.sh -f
 ```
 
 #### Solution 2: Hook not executable
@@ -230,7 +230,7 @@ ls -la ~/.config/omarchy/themes/$THEME/tmux.conf
 #### Solution 1: Regenerate all configs
 
 ```bash
-bash install.sh -f
+bash omarchy-tmux-install.sh -f
 ```
 
 This regenerates configs for **all** themes.
@@ -344,7 +344,7 @@ If empty → Integration not installed.
 #### Solution 1: Run installer
 
 ```bash
-bash install.sh
+bash omarchy-tmux-install.sh
 ```
 
 #### Solution 2: Manual integration
@@ -404,7 +404,7 @@ chmod +x ~/.config/omarchy/hooks/theme-set
 chmod +x ~/.local/bin/omarchy-tmux-reload
 
 # Retry installation
-bash install.sh
+bash omarchy-tmux-install.sh
 ```
 
 ## 7. TPM Not Found
@@ -610,7 +610,7 @@ cp ~/.config/tmux/tmux.conf \
    ~/.config/tmux/tmux.conf.backup-$(date +%Y%m%d-%H%M%S)
 
 # Retry installation
-bash install.sh
+bash omarchy-tmux-install.sh
 ```
 
 ## 12. Hook Not Triggering
@@ -779,7 +779,7 @@ This is static and should never be changed manually.
 exit
 
 # Then run installer
-bash install.sh
+bash omarchy-tmux-install.sh
 
 # Then start tmux
 tmux
