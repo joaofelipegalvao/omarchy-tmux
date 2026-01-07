@@ -4,7 +4,7 @@ All notable changes to Omarchy Tmux will be documented in this file.
 
 # [2.0.0](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v1.0.0...v2.0.0) (2026-01-07)
 
-* feat!: migrate from standalone plugin to PowerKit integration ([COMMIT](https://github.com/joaofelipegalvao/omarchy-tmux/commit/COMMIT))
+* feat!: migrate from standalone plugin to PowerKit integration ([867f4b9](https://github.com/joaofelipegalvao/omarchy-tmux/commit/867f4b95896560f94ecfc5f970c6287084cffca3))
 
 ### BREAKING CHANGES
 
