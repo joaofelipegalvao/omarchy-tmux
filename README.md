@@ -2,90 +2,233 @@
 
 <p align="center">
   <a href="https://omarchy.org" target="_blank">
-    <img src="https://img.shields.io/badge/Omarchy-Compatible-7aa2f7?style=flat-square&labelColor=1a1b26&logo=archlinux&logoColor=c0caf5"/>
+    <img src="https://img.shields.io/badge/Omarchy-3.1+-7aa2f7?style=flat-square&labelColor=1a1b26&logo=archlinux&logoColor=c0caf5"/>
+  </a>
+  <a href="https://github.com/fabioluciano/tmux-powerkit" target="_blank">
+    <img src="https://img.shields.io/badge/PowerKit-Compatible-7aa2f7?style=flat-square&labelColor=1a1b26&logo=tmux&logoColor=c0caf5"/>
   </a>
   <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/LICENSE" target="_blank">
     <img src="https://img.shields.io/badge/License-MIT-7aa2f7?style=flat-square&labelColor=1a1b26&logo=github&logoColor=c0caf5"/>
   </a>
-  <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/INSTALL.md" target="_blank">
+<a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/INSTALL.md" target="_blank">
     <img src="https://img.shields.io/badge/Installation-Guide-7aa2f7?style=flat-square&labelColor=1a1b26&logo=tmux&logoColor=c0caf5"/>
   </a>
-    <a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/HOW_IT_WORKS.md" target="_blank">
+<a href="https://github.com/joaofelipegalvao/omarchy-tmux/blob/main/docs/HOW_IT_WORKS.md" target="_blank">
     <img src="https://img.shields.io/badge/How_It-Works-7aa2f7?style=flat-square&labelColor=1a1b26&logo=readthedocs&logoColor=c0caf5"/>
   </a>
   <a href="https://github.com/joaofelipegalvao/omarchy-tmux/releases" target="_blank">
     <img src="https://img.shields.io/github/v/release/joaofelipegalvao/omarchy-tmux?style=flat-square&labelColor=1a1b26&color=7aa2f7&logo=github&logoColor=c0caf5"/>
   </a>
-
 </p>
 
 <div align="center">
   
-Tmux themes that automatically sync with <a href="https://omarchy.org">Omarchy</a> theme changes.
+**Seamless [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) integration for [Omarchy Linux](https://omarchy.org)**
 
-![Demo](assets/demo.gif)
+**40+ themes · 60+ variants · Instant switching · Zero config editing**
 
-<p align="center"><em>Watch how tmux automatically updates when switching Omarchy themes with <code>Super + Ctrl + Shift + Space</code></em></p></div>
+  <table>
+  <tr>
+    <td align="center">
+      <img src="assets/catppuccin-macchiato.png" alt="Theme 1" width="400"/>
+      <br/>
+      <sub><b>Catppuccin Macchiato</b></sub>
+    </td>
+    <td align="center">
+      <img src="assets/catppuccin-latte.png" alt="Theme 2" width="400"/>
+      <br/>
+      <sub><b>Catppuccin Latte</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/everforest-dark.png" alt="Theme 3" width="400"/>
+      <br/>
+      <sub><b>Everforest</b></sub>
+    </td>
+    <td align="center">
+      <img src="assets/gruvbox-dark.png" alt="Theme 4" width="400"/>
+      <br/>
+      <sub><b>Gruvbox</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/kanagawa-dragon.png" alt="Theme 5" width="400"/>
+      <br/>
+      <sub><b>Kanagawa</b></sub>
+    </td>
+    <td align="center">
+      <img src="assets/nord.png" alt="Theme 6" width="400"/>
+      <br/>
+      <sub><b>Nord</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/rose-pine-dawn.png" alt="Theme 7" width="400"/>
+      <br/>
+      <sub><b>Rose Pine Dawn</b></sub>
+    </td>
+    <td align="center">
+      <img src="assets/tokyo-night.png" alt="Theme 8" width="400"/>
+      <br/>
+      <sub><b>Tokyo Night</b></sub>
+    </td>
+  </tr>
+</table>
+
+<p align="center"><em>tmux updates automatically when switching Omarchy themes with <code>Super + Ctrl + Shift + Space</code></em></p>
+
+</div>
 
 ## Features
 
-- All 12 Omarchy themes supported
-- Automatic theme synchronization
-- Optional Nerd Font icons
-- TPM compatible
-- Auto-reload via systemd service
+- 🎨 **40+ themes with 60+ variants** — Full PowerKit theme library
+- ⚡ **Instant theme switching** — Updates via symlinks, no file regeneration
+- 🔧 **Per-theme customization** — Settings persist across theme changes
+- 🔗 **Symlink architecture** — Static tmux.conf, dynamic theme loading
+- 📦 **Rich plugin ecosystem** — cpu, memory, battery, weather, git, kubernetes, and more
 
 ## Quick Start
+
+#### 1. Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/scripts/omarchy-tmux-install.sh | bash
 ```
 
-Then inside tmux, press `prefix + I` (Ctrl+b Shift+i) to install plugins.
+#### 2. Inside tmux, install PowerKit
 
-> **Security Tip**: Always review scripts before running. See [Installation Guide](docs/INSTALL.md) for manual installation.
+```
+prefix + I (Ctrl+b Shift+i)
+```
+
+#### 3. Switch themes in Omarchy
+
+```
+Super + Ctrl + Shift + Space
+```
+
+> **Security**: Review the [install script](install.sh) before running  
+> **Manual**: See [Installation Guide](docs/INSTALL.md)
 
 ## Requirements
 
-- [Omarchy](https://omarchy.org)
-- [Tmux](https://github.com/tmux/tmux/wiki)
-- [TPM](https://github.com/tmux-plugins/tpm)
-- `systemd --user` support
+- [Omarchy Linux](https://omarchy.org) 3.1+ (hooks support)
+- [tmux](https://github.com/tmux/tmux/wiki) 2.9+
+- [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
+- git
+
+## How It Works
+
+```
+~/.config/tmux/tmux.conf (static)
+    ↓ source-file
+~/.config/omarchy/current/theme/tmux.conf (symlink)
+    ↓ points to
+~/.config/omarchy/themes/ACTIVE_THEME/tmux.conf (generated)
+    ↓ contains
+PowerKit config with theme settings
+```
+
+**On theme change:**
+
+1. Omarchy updates symlink
+2. Hook triggers reload script
+3. tmux sources new config
+4. Theme updates instantly
+
+See [How It Works](docs/HOW_IT_WORKS.md) for detailed architecture.
+
+## Supported Themes
+
+<details>
+<summary><strong>40+ themes with 60+ variants (click to expand)</strong></summary>
+
+**Fully Supported:**
+
+- Catppuccin (latte, macchiato, frappe, mocha)
+- Rose Pine (dawn, main, moon)
+- Tokyo Night (night, storm, day)
+- Gruvbox (dark, light)
+- Everforest (dark, light)
+- Kanagawa (dragon, lotus)
+- Flexoki (light, dark)
+- Nord, Dracula, Solarized
+- GitHub, Ayu, Material, Monokai
+- OneDark, Atom, Cobalt2, Darcula
+- Horizon, Iceberg, Kiribyte, Molokai
+- Moonlight, Night Owl, Oceanic Next
+- Pastel, Poimandres, Slack, Snazzy
+- Spacegray, Synthwave, Vesper
+
+**Unsupported (fallback to Tokyo Night):**
+
+- ethereal, hackerman, matte-black, osaka*, ristretto
+
+</details>
+
+## Customization
+
+Each theme has its own config at `~/.config/omarchy/themes/THEME_NAME/tmux.conf`.
+
+### Quick Examples
+
+```bash
+# Change plugins
+set -g @powerkit_plugins "datetime,battery,cpu,memory,weather,git"
+
+# Change separator style (normal, rounded, flame, pixel, honeycomb)
+set -g @powerkit_separator_style "rounded"
+
+# Change update interval
+set -g @powerkit_status_interval "5"
+```
+
+### Available Plugins
+
+```
+datetime, battery, cpu, memory, hostname, disk, load,
+git, weather, network, wifi, vpn, bluetooth, volume,
+kubernetes, terraform, docker, github, packages, ...
+```
+
+**Customizations persist** when switching themes!
+
+See [PowerKit Documentation](https://github.com/fabioluciano/tmux-powerkit) for full options.
 
 ## Documentation
 
-- **[Installation Guide](docs/INSTALL.md)** - Detailed installation instructions and configuration
-- **[How It Works](docs/HOW_IT_WORKS.md)** - Architecture and technical details
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- 📚 [Installation Guide](docs/INSTALL.md) — Setup, options, and configuration
+- 🔧 [How It Works](docs/HOW_IT_WORKS.md) — Architecture deep dive
+- 🐛 [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and solutions
 
-## Quick Configuration
+## Troubleshooting
 
-### Disable Icons
-
-If you prefer a cleaner look without icons, you can disable them.
-
-Edit `~/.config/omarchy/themes/[theme]/tmux.conf`:
+**Theme not updating?**
 
 ```bash
-set -g @theme_no_patched_font '1'
+ls -l ~/.config/omarchy/current/theme  # Check symlink
+cat ~/.config/omarchy/hooks/theme-set  # Check hook
+~/.local/bin/omarchy-tmux-reload       # Test reload
 ```
 
-**Example without icons:**
-
-[![No icons preview](https://i.postimg.cc/WzZnKGS0/screenshot-2025-10-10-09-17-19.png)](https://postimg.cc/8f1Mfr2C)
-
-
-### Manual Reload
+**PowerKit not installed?**
 
 ```bash
-tmux source-file ~/.config/tmux/tmux.conf
+Inside tmux, press: prefix + I (Ctrl+b Shift+i)
 ```
+
+See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for more help.
 
 ## Uninstall
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/scripts/omarchy-tmux-uninstall.sh | bash
 ```
+
+See [Installation Guide](docs/INSTALL.md#uninstall) for manual steps.
 
 ## Contributing
 
@@ -94,14 +237,22 @@ Contributions are welcome! Please:
 1. Fork the repository
 2. Create a feature branch
 3. Test thoroughly
-4. Submit a pull request
+4. Submit a pull request with clear description
+
+**Report issues**: Include Omarchy version, tmux version, current theme, and error messages.
 
 ## Acknowledgments
 
-- Thanks @dhh for [Omarchy](https://omarchy.org)
-- [TPM](https://github.com/tmux-plugins/tpm) - Tmux Plugin Manager
-- Community theme creators
+- [@dhh](https://github.com/dhh) — [Omarchy Linux](https://omarchy.org)
+- [@fabioluciano](https://github.com/fabioluciano) — [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)
+- [@bruno-](https://github.com/bruno-) — [TPM](https://github.com/tmux-plugins/tpm)
 
----
+<div align="center">
 
-**Note**: This plugin does not modify Omarchy's core files (in `~/.local/share/omarchy`). All configurations are stored in user-editable locations (`~/.config`).
+**[Omarchy](https://omarchy.org)** · **[PowerKit](https://github.com/fabioluciano/tmux-powerkit)** · **[Issues](https://github.com/joaofelipegalvao/omarchy-tmux/issues)**
+
+Made with ❤️ for Omarchy users
+
+⭐ Star this repo if you find it useful!
+
+</div>
