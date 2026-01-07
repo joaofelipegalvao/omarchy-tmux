@@ -110,7 +110,7 @@ prefix + I (Ctrl+b Shift+i)
 Super + Ctrl + Shift + Space
 ```
 
-> **Security**: Review the [install script](install.sh) before running  
+> **Security**: Review the [install script](scripts/omarchy-tmux-install.sh) before running  
 > **Manual**: See [Installation Guide](docs/INSTALL.md)
 
 ## Requirements
