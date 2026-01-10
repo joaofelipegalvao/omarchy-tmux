@@ -1,21 +1,21 @@
 #!/bin/bash
-# Omarchy Tmux - PowerKit Uninstaller
-# Removes tmux-powerkit integration with Omarchy
+# Omarchy Tmux - Uninstaller
+# Removes all Omarchy Tmux integration
 # https://github.com/joaofelipegalvao/omarchy-tmux
 
 set -euo pipefail
 
-readonly VERSION="2.0.1"
+readonly VERSION="2.1.0"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 readonly RELOAD_SCRIPT="$HOME/.local/bin/omarchy-tmux-reload"
+readonly GENERATOR_SCRIPT="$HOME/.local/bin/omarchy-tmux-generator"
 readonly HOOK_FILE="$HOME/.config/omarchy/hooks/theme-set"
-readonly OMARCHY_DIR="$HOME/.config/omarchy"
-readonly THEMES_DIR="$OMARCHY_DIR/themes"
+readonly PERSISTENT_THEMES_DIR="$HOME/.config/tmux/omarchy-themes"
+readonly CURRENT_THEME_LINK="$HOME/.config/tmux/omarchy-current-theme.conf"
 
 QUIET=0
-FORCE=0
-KEEP_CONFIGS=0
-CLEANUP_NEEDED=0
+KEEP_THEMES=0
+YES=0
 
 # Colors
 readonly RED='\033[0;31m'
@@ -31,370 +31,233 @@ error() {
   echo -e "${RED}✗${NC} $*" >&2
   exit 1
 }
-info() { [[ $QUIET -eq 0 ]] && echo -e "${BLUE}ℹ${NC} $*"; }
-
-# Cleanup trap
-cleanup() {
-  local exit_code=$?
-  if [[ $exit_code -ne 0 && $CLEANUP_NEEDED -eq 1 ]]; then
-    warn "Uninstallation failed - some changes may be incomplete"
-    warn "Check error messages above for details"
-    warn "You can safely re-run the uninstaller to retry"
-  fi
-}
-trap cleanup EXIT
+info() { [[ $QUIET -eq 0 ]] && echo -e "${BLUE}ℹ ${NC} $*"; }
 
 usage() {
   cat <<EOF
 Omarchy Tmux Uninstaller v$VERSION
 
-Removes tmux-powerkit integration with Omarchy.
+Removes Omarchy Tmux v2.1 integration and related files.
 
 Usage: $(basename "$0") [OPTIONS]
 
 Options:
   -h, --help          Show this help
   -q, --quiet         Minimal output
-  -f, --force         Skip confirmation prompts
-  -k, --keep-configs  Keep generated theme configs (only remove integration)
+  -y, --yes           Skip confirmation prompts
+  -k, --keep-themes   Keep theme configurations (don't delete)
   -v, --version       Show version
+
+What will be removed:
+  • Omarchy v2.1 integration from ~/.config/tmux/tmux.conf
+  • Scripts: omarchy-tmux-reload, omarchy-tmux-generator
+  • Hook from ~/.config/omarchy/hooks/theme-set
+  • Symlink: ~/.config/tmux/omarchy-current-theme.conf
+  • Theme profiles: ~/.config/tmux/omarchy-themes/ (unless -k)
+
+Note: This uninstaller is for v2.1 only. 
+      For v2.0 or earlier, use the uninstaller from that release.
+
+What will NOT be removed:
+  • tmux itself
+  • TPM (Tmux Plugin Manager)
+  • Your custom tmux.conf settings
+  • PowerKit plugin (can be removed via TPM)
+
 EOF
   exit 0
 }
 
-# Confirmation
 confirm() {
-  [[ $FORCE -eq 1 ]] && return 0
+  [[ $YES -eq 1 ]] && return 0
 
-  echo -e "${YELLOW}$1${NC}"
-  read -r -p "Continue? [y/N] " response
-
-  case "$response" in
-  [yY][eE][sS] | [yY]) ;;
-  *)
-    echo "Cancelled."
-    exit 0
-    ;;
-  esac
+  local prompt="$1"
+  echo -e "${YELLOW}?${NC} $prompt [y/N]: "
+  read -r response
+  [[ "$response" =~ ^[Yy]$ ]]
 }
 
-# Removal Functions
-remove_tmux_integration() {
-  log "Removing tmux.conf integration..."
-
-  CLEANUP_NEEDED=1
-
-  [[ ! -f "$TMUX_CONF" ]] && {
-    info "tmux.conf not found, skipping"
-    return 0
-  }
-
-  if ! grep -qE "Omarchy Tmux Integration|omarchy/current/theme/tmux.conf" "$TMUX_CONF"; then
-    info "No Omarchy integration found in tmux.conf"
-    return 0
-  fi
-
-  # Create backup with validation
-  local backup="${TMUX_CONF}.backup-$(date +%Y%m%d-%H%M%S)"
-  if ! cp "$TMUX_CONF" "$backup"; then
-    error "Failed to create backup at $backup
-Cannot proceed without backup"
-  fi
-
-  if [[ ! -f "$backup" ]]; then
-    error "Backup verification failed at $backup"
-  fi
-
-  info "Created backup at $backup"
-
-  # Create temp file for safe editing
-  local tmp_file
-  tmp_file="$(mktemp)"
-
-  # Copy original to temp
-  if ! cp "$TMUX_CONF" "$tmp_file"; then
-    rm -f "$tmp_file"
-    error "Failed to create temporary file"
-  fi
-
-  # 1️⃣ Remove managed integration block (v2)
-  if ! sed -i '/# Omarchy Tmux Integration/,/# End Omarchy Tmux Integration/d' "$tmp_file"; then
-    warn "Could not remove integration block with sed"
-    rm -f "$tmp_file"
-    error "Failed to process tmux.conf (backup preserved at $backup)"
-  fi
-
-  # 2️⃣ Remove stray source-file lines (legacy / broken installs)
-  sed -i '\|source-file ~/.config/omarchy/current/theme/tmux.conf|d' "$tmp_file" || true
-
-  # 3️⃣ Ensure TPM init block is correct and isolated
-  if grep -q "run '~/.tmux/plugins/tpm/tpm'" "$tmp_file"; then
-    sed -i '
-      /# Initialize and run tpm/{
-        N
-        /run '\''~\/\.tmux\/plugins\/tpm\/tpm'\''/!{
-          a\
-run '\''~\/.tmux\/plugins\/tpm\/tpm'\''
-        }
-      }
-    ' "$tmp_file" || true
-  fi
-
-  # 4️⃣ Normalize spacing (max 1 blank line)
-  sed -i ':a;N;$!ba;s/\n\{3,\}/\n\n/g' "$tmp_file" || true
-  sed -i '${/^$/d;}' "$tmp_file" || true
-
-  # Verify temp file is not empty
-  if [[ ! -s "$tmp_file" ]]; then
-    rm -f "$tmp_file"
-    error "Processed file is empty - keeping original (backup at $backup)"
-  fi
-
-  # Replace original with processed file
-  if ! mv "$tmp_file" "$TMUX_CONF"; then
-    rm -f "$tmp_file"
-    error "Failed to update tmux.conf (backup preserved at $backup)"
-  fi
-
-  log "Removed Omarchy integration from tmux.conf"
-}
-
-remove_reload_script() {
-  log "Removing reload script..."
-
-  if [[ ! -f "$RELOAD_SCRIPT" ]]; then
-    info "Reload script not found, skipping"
-    return 0
-  fi
-
-  # Verify it's our script before removing
-  if ! grep -q "Omarchy Tmux Reload Script" "$RELOAD_SCRIPT" 2>/dev/null; then
-    warn "Found script at $RELOAD_SCRIPT but it's not managed by omarchy-tmux"
-    warn "Skipping removal (remove manually if needed)"
-
-    if [[ $QUIET -eq 0 ]]; then
-      echo ""
-      read -r -p "Show script content? [y/N] " show_content
-      if [[ "$show_content" =~ ^[yY]$ ]]; then
-        echo -e "${CYAN}Content of $RELOAD_SCRIPT:${NC}"
-        head -n 10 "$RELOAD_SCRIPT"
-        echo "..."
-      fi
+backup_tmux_conf() {
+  if [[ -f "$TMUX_CONF" ]]; then
+    local backup="${TMUX_CONF}.backup-uninstall-$(date +%Y%m%d-%H%M%S)"
+    if cp "$TMUX_CONF" "$backup"; then
+      info "Created backup: $backup"
+      return 0
+    else
+      warn "Failed to create backup"
+      return 1
     fi
+  fi
+  return 0
+}
+
+remove_from_tmux_conf() {
+  log "Removing Omarchy integration from tmux.conf..."
+
+  if [[ ! -f "$TMUX_CONF" ]]; then
+    info "tmux.conf not found (nothing to remove)"
     return 0
   fi
 
-  if ! rm -f "$RELOAD_SCRIPT"; then
-    warn "Failed to remove reload script at $RELOAD_SCRIPT"
-    warn "You may need to remove it manually"
-    return 1
+  # Check if v2.1 integration exists
+  if ! grep -q "Omarchy Tmux Integration (v2.1)" "$TMUX_CONF" 2>/dev/null; then
+    info "No Omarchy v2.1 integration found in tmux.conf"
+    info "For v2.0 or earlier, use the uninstaller from that release"
+    return 0
   fi
 
-  log "Removed $RELOAD_SCRIPT"
+  # Create backup
+  backup_tmux_conf || warn "Continuing without backup..."
+
+  # Remove v2.1 integration block
+  sed -i '/# ============================================================================/,/# End Omarchy Tmux Integration/d' "$TMUX_CONF" 2>/dev/null || true
+
+  # Remove standalone source-file line (in case block removal failed)
+  sed -i '\|source-file ~/.config/tmux/omarchy-current-theme.conf|d' "$TMUX_CONF" 2>/dev/null || true
+
+  log "Removed Omarchy v2.1 integration from tmux.conf"
+}
+
+remove_scripts() {
+  log "Removing scripts..."
+
+  local removed=0
+
+  if [[ -f "$RELOAD_SCRIPT" ]]; then
+    rm -f "$RELOAD_SCRIPT" && ((removed++)) && info "Removed: $RELOAD_SCRIPT"
+  fi
+
+  if [[ -f "$GENERATOR_SCRIPT" ]]; then
+    rm -f "$GENERATOR_SCRIPT" && ((removed++)) && info "Removed: $GENERATOR_SCRIPT"
+  fi
+
+  if [[ $removed -eq 0 ]]; then
+    info "No scripts found to remove"
+  else
+    log "Removed $removed script(s)"
+  fi
 }
 
 remove_hook() {
-  log "Removing Omarchy hook..."
+  log "Removing hook integration..."
 
-  [[ ! -f "$HOOK_FILE" ]] && {
-    info "Hook file not found, skipping"
-    return 0
-  }
-
-  if ! grep -q 'omarchy-tmux-reload' "$HOOK_FILE"; then
-    info "Hook not installed, skipping"
+  if [[ ! -f "$HOOK_FILE" ]]; then
+    info "Hook file not found (nothing to remove)"
     return 0
   fi
 
-  # Create backup with validation
-  local backup="${HOOK_FILE}.backup-$(date +%Y%m%d-%H%M%S)"
-  if ! cp "$HOOK_FILE" "$backup"; then
-    warn "Failed to create backup at $backup"
-    warn "Proceeding without backup"
+  # Remove our reload script entry from hook
+  if grep -q "omarchy-tmux-reload" "$HOOK_FILE" 2>/dev/null; then
+    sed -i '\|omarchy-tmux-reload|d' "$HOOK_FILE" 2>/dev/null || true
+    log "Removed hook integration"
   else
-    if [[ ! -f "$backup" ]]; then
-      warn "Backup verification failed"
-    else
-      info "Created backup at $backup"
-    fi
+    info "Hook integration not found"
   fi
 
-  # Create temp file
-  local tmp_file
-  tmp_file="$(mktemp)"
-
-  if ! cp "$HOOK_FILE" "$tmp_file"; then
-    rm -f "$tmp_file"
-    error "Failed to create temporary file"
-  fi
-
-  # Remove our hook entry
-  if ! sed -i '/omarchy-tmux-reload/d' "$tmp_file"; then
-    rm -f "$tmp_file"
-    warn "Failed to remove hook entry"
-    return 1
-  fi
-
-  # Check if hook file would be empty (only shebang and comments)
-  if [[ $(grep -vE '^#!/bin/bash|^#|^$' "$tmp_file" | wc -l) -eq 0 ]]; then
-    rm -f "$tmp_file"
-
-    if ! rm -f "$HOOK_FILE"; then
-      warn "Failed to remove empty hook file"
-      return 1
+  # If hook file is now empty (except shebang), remove it
+  if [[ -f "$HOOK_FILE" ]]; then
+    local line_count=$(grep -cv '^#!/bin/bash' "$HOOK_FILE" 2>/dev/null || echo "0")
+    if [[ $line_count -eq 0 ]]; then
+      rm -f "$HOOK_FILE"
+      info "Removed empty hook file"
     fi
-
-    log "Removed empty hook file"
-  else
-    # Other hooks remain, just update the file
-    if ! mv "$tmp_file" "$HOOK_FILE"; then
-      rm -f "$tmp_file"
-      warn "Failed to update hook file"
-      return 1
-    fi
-
-    log "Removed hook entry (other hooks remain)"
   fi
 }
 
-remove_theme_configs() {
-  [[ $KEEP_CONFIGS -eq 1 ]] && {
-    info "Keeping theme configs (--keep-configs flag)"
+remove_symlink() {
+  log "Removing symlink..."
+
+  if [[ -L "$CURRENT_THEME_LINK" ]]; then
+    rm -f "$CURRENT_THEME_LINK"
+    log "Removed symlink: $CURRENT_THEME_LINK"
+  elif [[ -e "$CURRENT_THEME_LINK" ]]; then
+    warn "$CURRENT_THEME_LINK exists but is not a symlink (skipping)"
+  else
+    info "Symlink not found (nothing to remove)"
+  fi
+}
+
+remove_themes() {
+  log "Removing theme profiles..."
+
+  if [[ ! -d "$PERSISTENT_THEMES_DIR" ]]; then
+    info "Theme directory not found (nothing to remove)"
     return 0
-  }
+  fi
 
-  log "Removing generated theme configs..."
-  local count=0
-  local failed=0
+  # Count themes
+  local theme_count=$(find "$PERSISTENT_THEMES_DIR" -maxdepth 1 -name "*.conf" 2>/dev/null | wc -l)
 
-  for theme_dir in "$THEMES_DIR"/*; do
-    [[ ! -d "$theme_dir" ]] && continue
+  if [[ $theme_count -eq 0 ]]; then
+    info "No theme profiles found"
+    rmdir "$PERSISTENT_THEMES_DIR" 2>/dev/null || true
+    return 0
+  fi
 
-    local theme_name=$(basename "$theme_dir")
-    local tmux_file="$theme_dir/tmux.conf"
+  # Show what will be deleted
+  if [[ $QUIET -eq 0 ]]; then
+    echo -e "${CYAN}Theme profiles found:${NC}"
+    find "$PERSISTENT_THEMES_DIR" -maxdepth 1 -name "*.conf" -exec basename {} \; | sed 's/^/  • /'
+    echo ""
+  fi
 
-    if [[ ! -f "$tmux_file" ]]; then
-      continue
-    fi
-
-    # Verify it's our generated file
-    if ! grep -q "Auto-generated by omarchy-tmux installer" "$tmux_file" 2>/dev/null; then
-      continue
-    fi
-
-    # Create backup of the config
-    local backup="${tmux_file}.backup-$(date +%Y%m%d-%H%M%S)"
-    if ! cp "$tmux_file" "$backup" 2>/dev/null; then
-      warn "Could not backup config for $theme_name"
-    fi
-
-    if ! rm -f "$tmux_file"; then
-      warn "Failed to remove config for $theme_name"
-      ((failed++)) || true
-      continue
-    fi
-
-    ((count++)) || true
-  done
-
-  if [[ $count -gt 0 ]]; then
-    log "Removed $count theme config(s)"
-    if [[ $QUIET -eq 0 ]]; then
-      info "Backups created with .backup-* extension"
-    fi
+  if confirm "Delete $theme_count theme profile(s)?"; then
+    rm -rf "$PERSISTENT_THEMES_DIR"
+    log "Removed theme profiles directory"
   else
-    info "No auto-generated configs found"
-  fi
-
-  if [[ $failed -gt 0 ]]; then
-    warn "Failed to remove $failed config(s)"
+    info "Keeping theme profiles at: $PERSISTENT_THEMES_DIR"
   fi
 }
 
-check_powerkit_plugin() {
-  local locations=(
-    "$HOME/.config/tmux/plugins/tmux-powerkit"
-    "$HOME/.tmux/plugins/tmux-powerkit"
-  )
-
-  for dir in "${locations[@]}"; do
-    if [[ -d "$dir" ]]; then
-      if [[ $QUIET -eq 0 ]]; then
-        echo ""
-        warn "PowerKit plugin still installed at:"
-        warn "  $dir"
-        echo ""
-        echo -e "${CYAN}To remove PowerKit plugin:${NC}"
-        echo "  1. Start tmux"
-        echo -e "  2. Press ${YELLOW}prefix + Alt + u${NC}"
-        echo "  3. Select 'tmux-powerkit'"
-        echo ""
-        echo -e "${CYAN}Or remove manually:${NC}"
-        echo -e "  ${YELLOW}rm -rf $dir${NC}"
-        echo ""
-      fi
-      return 0
-    fi
-  done
+check_tmux_running() {
+  if tmux list-sessions &>/dev/null 2>&1; then
+    warn "tmux is currently running"
+    warn "You should reload tmux config after uninstallation:"
+    warn "  Run inside tmux: ${CYAN}tmux source-file ~/.config/tmux/tmux.conf${NC}"
+    warn "  Or restart all tmux sessions"
+    echo ""
+  fi
 }
 
-# Summary
-show_summary() {
-  [[ $QUIET -eq 1 ]] && return 0
-
-  echo ""
-  echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-  echo -e "${GREEN}║${NC}     ${GREEN}✓${NC} Uninstallation Complete         ${GREEN}║${NC}"
-  echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
-  echo ""
-
-  # Show backup locations
-  if compgen -G "${TMUX_CONF}.backup-*" >/dev/null 2>&1; then
-    echo -e "${CYAN}Backups created:${NC}"
-    echo -e "  ${YELLOW}${TMUX_CONF}.backup-*${NC}"
+show_powerkit_removal() {
+  if [[ $QUIET -eq 0 ]]; then
+    echo ""
+    echo -e "${CYAN}Optional: Remove PowerKit plugin${NC}"
+    echo ""
+    echo "To completely remove PowerKit from tmux:"
+    echo ""
+    echo "  1. Edit your tmux.conf:"
+    echo -e "     ${YELLOW}nano ~/.config/tmux/tmux.conf${NC}"
+    echo ""
+    echo "  2. Remove this line:"
+    echo -e "     ${YELLOW}set -g @plugin 'fabioluciano/tmux-powerkit'${NC}"
+    echo ""
+    echo "  3. Inside tmux, uninstall via TPM:"
+    echo -e "     Press ${YELLOW}prefix + alt + u${NC} (Ctrl+b Alt+u)"
+    echo ""
+    echo "  4. Reload tmux config:"
+    echo -e "     ${YELLOW}tmux source-file ~/.config/tmux/tmux.conf${NC}"
+    echo ""
   fi
-
-  if compgen -G "${HOOK_FILE}.backup-*" >/dev/null 2>&1; then
-    echo -e "  ${YELLOW}${HOOK_FILE}.backup-*${NC}"
-  fi
-
-  if compgen -G "$THEMES_DIR/*/tmux.conf.backup-*" >/dev/null 2>&1; then
-    echo -e "  ${YELLOW}$THEMES_DIR/*/tmux.conf.backup-*${NC}"
-  fi
-
-  echo ""
-
-  check_powerkit_plugin
-
-  echo -e "${CYAN}What was removed:${NC}"
-  echo "  • Omarchy integration from tmux.conf"
-  echo "  • Reload script ($RELOAD_SCRIPT)"
-  echo "  • Theme change hook"
-  if [[ $KEEP_CONFIGS -eq 0 ]]; then
-    echo "  • Auto-generated theme configs"
-  fi
-
-  echo ""
-  echo -e "${CYAN}What remains:${NC}"
-  echo "  • Your custom tmux.conf settings"
-  echo "  • TPM and other plugins"
-  if [[ $KEEP_CONFIGS -eq 1 ]]; then
-    echo "  • Theme configs (--keep-configs was used)"
-  fi
-
-  echo ""
-  echo -e "${GREEN}Tmux will continue to work normally.${NC}"
-  echo ""
 }
 
-# Main
 main() {
+  # Parse arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
     -h | --help) usage ;;
-    -q | --quiet) QUIET=1 ;;
-    -f | --force) FORCE=1 ;;
-    -k | --keep-configs) KEEP_CONFIGS=1 ;;
+    -q | --quiet)
+      QUIET=1
+      shift
+      ;;
+    -y | --yes)
+      YES=1
+      shift
+      ;;
+    -k | --keep-themes)
+      KEEP_THEMES=1
+      shift
+      ;;
     -v | --version)
       echo "$VERSION"
       exit 0
@@ -402,12 +265,11 @@ main() {
     *) error "Unknown option: $1
 Use --help for usage" ;;
     esac
-    shift
   done
 
   # Header
   if [[ $QUIET -eq 0 ]]; then
-    echo -e "${BLUE}"
+    echo -e "${RED}"
     cat <<"BANNER"
  ▄██████▄    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄████████    ▄█    █▄    ▄██   ▄   
 ███    ███ ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███   ███    ███   ███   ██▄ 
@@ -420,19 +282,78 @@ Use --help for usage" ;;
                                           ███    ███                                    
 BANNER
     echo -e "${NC}"
-    echo -e "${CYAN}                           Tmux PowerKit Uninstaller${NC}"
+    echo -e "${RED}                         Tmux Uninstaller v$VERSION${NC}"
     echo ""
   fi
 
-  confirm "This will remove Omarchy-tmux integration.
-Backups will be created for all modified files."
+  # Confirmation
+  if [[ $YES -eq 0 ]]; then
+    echo -e "${YELLOW}This will remove Omarchy Tmux integration from your system.${NC}"
+    echo ""
+    echo "The following will be removed:"
+    echo "  • Omarchy integration from tmux.conf"
+    echo "  • Scripts: omarchy-tmux-reload, omarchy-tmux-generator"
+    echo "  • Hook from theme-set"
+    echo "  • Symlink: omarchy-current-theme.conf"
+    [[ $KEEP_THEMES -eq 0 ]] && echo "  • Theme profiles directory"
+    echo ""
+    echo "The following will NOT be removed:"
+    echo "  • Your custom tmux.conf settings"
+    echo "  • tmux and TPM"
+    echo "  • PowerKit plugin (manual removal required)"
+    echo ""
 
-  remove_tmux_integration
-  remove_reload_script
+    if ! confirm "Proceed with uninstallation?"; then
+      echo ""
+      echo -e "${BLUE}Uninstallation cancelled.${NC}"
+      exit 0
+    fi
+    echo ""
+  fi
+
+  # Check if tmux is running
+  check_tmux_running
+
+  # Perform uninstallation
+  remove_from_tmux_conf
+  remove_scripts
   remove_hook
-  remove_theme_configs
+  remove_symlink
 
-  show_summary
+  if [[ $KEEP_THEMES -eq 0 ]]; then
+    remove_themes
+  else
+    info "Keeping theme profiles as requested"
+  fi
+
+  # Success message
+  if [[ $QUIET -eq 0 ]]; then
+    echo ""
+    echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║${NC}     ${GREEN}✓${NC} Uninstallation Complete          ${GREEN}║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
+    echo ""
+
+    if [[ $KEEP_THEMES -eq 1 ]]; then
+      echo -e "${CYAN}Theme profiles preserved at:${NC}"
+      echo -e "  ${YELLOW}$PERSISTENT_THEMES_DIR${NC}"
+      echo ""
+    fi
+
+    echo -e "${CYAN}Next steps:${NC}"
+    echo ""
+    echo "  1. If tmux is running, reload config:"
+    echo -e "     ${YELLOW}tmux source-file ~/.config/tmux/tmux.conf${NC}"
+    echo ""
+    echo "  2. (Optional) Remove PowerKit plugin"
+    echo -e "     See instructions below"
+    echo ""
+
+    show_powerkit_removal
+
+    echo -e "${GREEN}Thank you for using Omarchy Tmux! 👋${NC}"
+    echo ""
+  fi
 }
 
 main "$@"
