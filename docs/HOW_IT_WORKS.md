@@ -1,271 +1,221 @@
 # How It Works
 
-Understanding how **Omarchy Tmux v2.0** integrates with your system.
+Understanding how **Omarchy Tmux v2.1** integrates with your system.
 
-> **Architecture Change in v2.0**: This version uses [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)
-> instead of custom theme files, with a symlink-based configuration system.
+> **Architecture note (v2.1)**: This version introduces *persistent theme profiles*, where each theme maintains its own configuration file that survives theme switches.
+
+---
 
 ## Overview
 
-Omarchy Tmux automatically reloads tmux when you change your Omarchy theme, using a **zero-edit symlink architecture**. Your tmux config stays static while the theme content updates dynamically through symlinks.
+Omarchy Tmux integrates Omarchy theme switching with tmux by keeping your main `tmux.conf` static and dynamically loading the active theme through a symlink that points to a **persistent theme profile**.
+
+The result is a system where:
+
+* tmux configuration remains stable
+* themes are switched instantly
+* user customizations are never overwritten
+
+---
 
 ## Architecture Components
 
 ### 1. Static tmux.conf
 
-Your main config at `~/.config/tmux/tmux.conf` contains a single source line:
+Your main tmux configuration file contains a single, permanent integration line:
 
 ```bash
-source-file ~/.config/omarchy/current/theme/tmux.conf
+source-file ~/.config/tmux/omarchy-current-theme.conf
 ```
 
-**This line never changes** — it always points to the same symlink path.
+This line never changes. It always points to the same symlink location.
+
+---
 
 ### 2. Dynamic Symlink
 
-The path `~/.config/omarchy/current/theme/` is a **symlink** managed by Omarchy:
+The file below is a symlink managed by Omarchy Tmux:
 
 ```bash
-~/.config/omarchy/current/theme → ~/.config/omarchy/themes/tokyo-night
+~/.config/tmux/omarchy-current-theme.conf
 ```
 
-When you switch themes, Omarchy updates this symlink:
+It always points to the currently active theme profile:
 
 ```bash
-~/.config/omarchy/current/theme → ~/.config/omarchy/themes/catppuccin
+~/.config/tmux/omarchy-current-theme.conf → ~/.config/tmux/omarchy-themes/tokyo-night.conf
 ```
 
-### 3. Theme Configs
+When you switch themes, only this symlink is updated.
 
-Each Omarchy theme has its own tmux config:
+---
+
+### 3. Persistent Theme Profiles
+
+Each theme has its own configuration file stored in:
 
 ```bash
-~/.config/omarchy/themes/tokyo-night/tmux.conf
-~/.config/omarchy/themes/catppuccin/tmux.conf
-~/.config/omarchy/themes/gruvbox/tmux.conf
-# ... etc for all themes
+~/.config/tmux/omarchy-themes/
 ```
 
-Each config contains:
+Example profiles:
 
 ```bash
-# PowerKit Plugin
-set -g @plugin 'fabioluciano/tmux-powerkit'
-
-# Theme Configuration
-set -g @powerkit_theme 'tokyo-night'
-set -g @powerkit_theme_variant 'night'
-
-# Plugins
-set -g @powerkit_plugins "datetime,battery,cpu,memory,hostname"
-
-# Visual Options
-set -g @powerkit_separator_style "normal"
-
-# Performance
-set -g @powerkit_status_interval "5"
+tokyo-night.conf
+catppuccin-mocha.conf
+rose-pine-moon.conf
+gruvbox-dark.conf
 ```
 
-### 4. Omarchy Hook
+Key properties:
 
-The installer adds a hook set `~/.config/omarchy/hooks/theme-set`:
+* Created once, on first use
+* Never regenerated automatically
+* Safe to edit directly
+
+These files contain both PowerKit settings and any user customizations.
+
+---
+
+### 4. Theme Generator
+
+The generator script creates theme profiles *on demand* and updates the symlink:
 
 ```bash
-#!/bin/bash
+~/.local/bin/omarchy-tmux-generator
+```
+
+Its responsibilities are:
+
+1. Read the current Omarchy theme name
+2. Create a theme profile if it does not exist
+3. Update the symlink to point to that profile
+
+If a profile already exists, it is left untouched.
+
+---
+
+### 5. Omarchy Hook
+
+Omarchy triggers theme updates through a hook installed at:
+
+```bash
+~/.config/omarchy/hooks/theme-set
+```
+
+This hook simply calls the reload script whenever the theme changes.
+
+---
+
+### 6. Reload Script
+
+The reload script coordinates updates and tmux refresh:
+
+```bash
 ~/.local/bin/omarchy-tmux-reload
 ```
 
-and the reload script simply re-sources ***tmux.conf***, which follows the symlink.
-This guarantees correctness even if ***Omarchy*** changes how hooks are invoked.
+It performs the following steps:
 
-### 5. Reload Script
+1. Executes the generator (if present)
+2. Reloads `tmux.conf` for all running sessions
+3. Refreshes tmux clients
 
-The reload script at `~/.local/bin/omarchy-tmux-reload`:
+---
 
-```bash
-#!/bin/bash
-set -euo pipefail
+### 7. PowerKit
 
-readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
+[tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) is responsible for rendering the visual theme:
 
-# Reload all tmux sessions
-if tmux list-sessions &>/dev/null 2>&1; then
-  # Reload config
-  tmux source-file "$TMUX_CONF" &>/dev/null || true
+* Status bar colors and layout
+* Plugin rendering (battery, cpu, datetime, etc.)
+* Theme variants (light/dark)
 
-  # Refresh all clients
-  tmux refresh-client -S &>/dev/null || true
-fi
+Omarchy Tmux only provides configuration; PowerKit handles presentation.
 
-exit 0
-```
+---
 
-### 6. PowerKit Plugin
-
-[tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) handles the actual theme rendering:
-
-* Reads theme settings from the config
-* Applies colors and styles to tmux status bar
-* Renders plugins (datetime, battery, CPU, etc.)
-* Manages theme variants (light/dark)
-
-## Complete Flow Diagram
+## Theme Switching Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  User switches Omarchy theme                                    │
-│  (e.g. Super + Ctrl + Shift + Space)                            │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Omarchy updates symlink:                                       │
-│  ~/.config/omarchy/current/theme → themes/NEW_THEME             │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Omarchy triggers hook (no arguments):                          │
-│  ~/.config/omarchy/hooks/theme-set                              │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Hook executes reload script:                                   │
-│  ~/.local/bin/omarchy-tmux-reload                               │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Reload script sources:                                         │
-│  tmux source-file ~/.config/tmux/tmux.conf                      │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  tmux.conf sources symlink:                                     │
-│  source-file ~/.config/omarchy/current/theme/tmux.conf          │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Symlink resolves to active theme:                              │
-│  ~/.config/omarchy/themes/NEW_THEME/tmux.conf                   │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PowerKit reads config and applies theme                        │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  ✨ New theme visible in all tmux sessions instantly            │
-└─────────────────────────────────────────────────────────────────┘
+User switches Omarchy theme
+        ↓
+Omarchy updates theme.name
+        ↓
+Omarchy triggers theme-set hook
+        ↓
+Reload script runs
+        ↓
+Generator ensures profile exists
+        ↓
+Symlink updated to active profile
+        ↓
+tmux reloads configuration
+        ↓
+PowerKit applies the theme
 ```
 
-## Why PowerKit?
+---
 
-### The v1.0 Architecture (Custom Themes)
+## Why Persistent Profiles?
 
-The old architecture **also used symlinks** (same concept!), but with custom theme files:
+### Previous Behavior (v2.0)
 
-```
-omarchy-tmux/
-├── themes/
-│   ├── catppuccin/
-│   │   ├── palettes/macchiato.sh
-│   │   ├── status.sh
-│   │   └── theme.sh
-│   ├── tokyo-night/
-│   │   ├── palettes/night.sh
-│   │   ├── status.sh
-│   │   └── theme.sh
-│   └── ... (12 themes total)
-└── tmux-themes.tmux  # TPM entry point
-```
+In v2.0, theme configurations were regenerated on every theme switch.
 
-**How it worked:**
+This caused:
 
-1. ✅ Symlink-based (same as v2.0!)
-2. ✅ Auto-reload via hooks (same!)
-3. ⚠️ Manual theme creation
-4. ⚠️ Limited themes
-5. ⚠️ Maintenance burden
+* Loss of user customizations
+* Tight coupling to Omarchy theme directories
+* Fragile upgrade paths
 
-### The v2.0 Evolution (PowerKit Integration)
+---
 
-v2.0 keeps the **same symlink architecture** but delegates theme rendering to PowerKit.
+### Current Behavior (v2.1)
 
-**What stayed the same:**
+v2.1 introduces standalone, persistent profiles:
 
-* ✅ Symlink-based configuration
-* ✅ Per-theme customization
-* ✅ Auto-reload via hooks
-* ✅ Zero edits to main tmux.conf
+* Profiles are created once
+* User edits are preserved permanently
+* Theme switching is reduced to a symlink update
 
-**What improved:**
+This makes theme customization safe and predictable.
 
-* ✅ 50+ themes
-* ✅ No theme maintenance
-* ✅ Consistent styling
-* ✅ More features
-* ✅ Active development
+---
 
-## Theme Mapping
+## Customization Model
 
-The installer maps Omarchy themes to PowerKit themes:
+The intended workflow is simple:
 
-```bash
-map_theme_to_powerkit() {
-  case "$theme" in
-    catppuccin-latte)
-      base="catppuccin"
-      variant="latte"
-      ;;
-    tokyo-night)
-      base="tokyo-night"
-      variant="night"
-      ;;
-    gruvbox-dark)
-      base="gruvbox"
-      variant="dark"
-      ;;
-  esac
-}
-```
+1. Switch to a theme using Omarchy
+2. Edit the generated profile in `~/.config/tmux/omarchy-themes/`
+3. Reload tmux if needed
 
-Unsupported themes fallback to Tokyo Night.
+You never need to modify symlinks or generator logic manually.
 
-## File Structure
+---
+
+## File Layout
 
 ```
 ~/.config/
 ├── tmux/
-│   └── tmux.conf
+│   ├── tmux.conf
+│   ├── omarchy-current-theme.conf → omarchy-themes/THEME.conf
+│   └── omarchy-themes/
 ├── omarchy/
-│   ├── current/
-│   │   └── theme → ../themes/tokyo-night
-│   ├── themes/
-│   │   ├── tokyo-night/
-│   │   │   └── tmux.conf
-│   │   └── catppuccin/
-│   │       └── tmux.conf
-│   └── hooks/
-│       └── theme-set
+│   ├── current/theme.name
+│   └── hooks/theme-set
 
 ~/.local/bin/
-└── omarchy-tmux-reload
+├── omarchy-tmux-reload
+└── omarchy-tmux-generator
 ```
 
-## Key Insight
-
-**v2.0 is not a rewrite.**
-
-It preserves the proven symlink-based architecture and simply offloads theme rendering to PowerKit, resulting in a cleaner, more scalable, and easier-to-maintain system.
+---
 
 ## Learn More
 
-* [PowerKit Documentation](https://github.com/fabioluciano/tmux-powerkit)
-* [Omarchy Hooks System](https://omarchy.org/docs/hooks)
-* [Tmux Plugin Manager](https://github.com/tmux-plugins/tpm)
+* Installation: [INSTALL.md](INSTALL.md)
+* Troubleshooting: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+* PowerKit: [https://github.com/fabioluciano/tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)

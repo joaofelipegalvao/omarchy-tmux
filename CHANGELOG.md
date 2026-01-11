@@ -2,6 +2,132 @@
 
 All notable changes to Omarchy Tmux will be documented in this file.
 
+# [2.1.0](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v2.0.0...v2.1.0) (2026-01-10)
+
+### Features
+
+* **Persistent Theme Profiles**: Complete redesign from symlink-switching to per-theme persistent configuration files ([omarchy-tmux-install.sh](https://github.com/joaofelipegalvao/omarchy-tmux/commit/7eea9f52b177480f6ca4ad8dd2b84f1f4d314bdd))
+
+### BREAKING CHANGES
+
+* Theme customizations now persist across theme switches instead of being overwritten
+
+#### Architecture Evolution: v2.0 → v2.1
+
+**v2.0 Architecture (Overwriting)**:
+
+* Single `~/.config/omarchy/themes/THEME/tmux.conf` per theme
+* Regenerated on every theme switch
+* Symlink pointed to active theme directory
+* User customizations lost on theme change
+
+**v2.1 Architecture (Persistent Profiles)**:
+
+* Centralized theme profiles in `~/.config/tmux/omarchy-themes/`
+* Theme configs created ONCE and never regenerated
+* Symlink `omarchy-current-theme.conf` points to persistent profile
+* User customizations preserved permanently per theme
+
+#### Key Improvements
+
+**Persistent Configuration**
+
+* Theme profiles in `~/.config/tmux/omarchy-themes/THEME_NAME.conf`
+* Profiles created only if they don't exist (no overwrites)
+* User customizations survive theme switches and returns
+* Each theme maintains its own configuration state
+
+**Simplified Generator Logic**
+
+* Generator checks file existence before creating
+* Only creates missing theme profiles
+* Updates symlink to point to current theme's persistent file
+* No more destructive regeneration
+
+**Enhanced User Experience**
+
+* Clear documentation in generated profiles explaining persistence
+* Profiles marked as "PERSISTENT THEME PROFILE" with usage instructions
+* Users encouraged to edit profiles directly at known location
+* Customizations clearly separated and preserved
+
+**Installation Improvements**
+
+* Generator script version-tagged (v2.1.0) for upgrade detection
+* Force flag (`-f`) respects existing profiles (only regenerates generator)
+* Better backup handling before tmux.conf modifications
+* TPM initialization line automatically moved to end of config if present
+
+**Configuration Management**
+
+* Removes obsolete v2.0 integration blocks automatically
+* Detects and preserves existing TPM run lines
+* Cleaner integration block with v2.1 marker
+* Timestamped backups before any modifications
+
+**Validation Enhancements**
+
+* Checks for Omarchy 3.3+ theme.name file
+* Validates generator script executability
+* Verifies persistent themes directory existence
+* Provides clear warnings for missing components
+
+#### Technical Changes
+
+**Generator Script (`omarchy-tmux-generator`)**
+
+* Version bumped to v2.1.0
+* Added existence check: `if [[ ! -f "$theme_file" ]]`
+* Removes profile regeneration logic
+* Simplified to symlink management + conditional creation
+* Header comments explain persistence model
+
+**Installation Flow**
+
+* Creates persistent themes directory upfront
+* Generates initial theme config via generator
+* Continues gracefully if initial generation fails
+* Hook system unchanged (still uses `omarchy-tmux-reload`)
+
+**File Structure Changes**
+
+```
+~/.config/tmux/
+├── tmux.conf (static, sources symlink)
+├── omarchy-current-theme.conf (symlink to active profile)
+└── omarchy-themes/
+    ├── tokyo-night.conf (persistent, user-editable)
+    ├── catppuccin-mocha.conf (persistent, user-editable)
+    ├── gruvbox-dark.conf (persistent, user-editable)
+    └── ... (one file per theme, created on first use)
+```
+
+**Theme Profile Format**
+Each profile contains:
+
+* Header documentation explaining persistence
+* PowerKit plugin declaration
+* Theme and variant configuration
+* Default plugin set (datetime, battery, cpu, memory, hostname)
+* Visual options (separator style, status interval)
+* Keybindings (T for theme selector, R for reload)
+* Editable custom configuration section
+
+**Backwards Compatibility**
+
+* Automatically migrates from v2.0 by creating persistent profiles
+* Old theme directories in `~/.config/omarchy/themes/` no longer used
+* Integration blocks in tmux.conf updated automatically
+* No manual intervention required
+
+#### Impact Summary
+
+* **User Benefit**: Theme customizations finally persist - edit once, keep forever
+* **Developer Benefit**: Simpler codebase without regeneration complexity
+* **Migration**: Seamless - v2.0 users just run v2.1 installer
+* **Customization**: Direct file editing at `~/.config/tmux/omarchy-themes/`
+* **Performance**: Faster theme switching (no config regeneration overhead)
+
 # [2.0.0](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v1.0.0...v2.0.0) (2026-01-07)
 
 * feat!: migrate from standalone plugin to PowerKit integration ([867f4b9](https://github.com/joaofelipegalvao/omarchy-tmux/commit/867f4b95896560f94ecfc5f970c6287084cffca3))

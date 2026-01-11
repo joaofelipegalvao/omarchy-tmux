@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://omarchy.org" target="_blank">
-    <img src="https://img.shields.io/badge/Omarchy-3.1+-7aa2f7?style=flat-square&labelColor=1a1b26&logo=archlinux&logoColor=c0caf5"/>
+    <img src="https://img.shields.io/badge/Omarchy-3.3+-7aa2f7?style=flat-square&labelColor=1a1b26&logo=archlinux&logoColor=c0caf5"/>
   </a>
   <a href="https://github.com/fabioluciano/tmux-powerkit" target="_blank">
     <img src="https://img.shields.io/badge/PowerKit-Compatible-7aa2f7?style=flat-square&labelColor=1a1b26&logo=tmux&logoColor=c0caf5"/>
@@ -23,9 +23,9 @@
 
 <div align="center">
   
-**Seamless [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) integration for [Omarchy Linux](https://omarchy.org)**
+**Seamless [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) integration for [Omarchy](https://omarchy.org)**
 
-**40+ themes · 60+ variants · Instant switching · Zero config editing**
+**40+ themes · 60+ variants · Instant switching · Persistent customizations**
 
   <table>
   <tr>
@@ -82,62 +82,86 @@
 
 </div>
 
+## Overview
+
+**Omarchy Tmux** provides native integration between **Omarchy** and **tmux-powerkit**, enabling tmux to automatically follow Omarchy theme changes while preserving user customizations.
+
+Starting from **v2.1**, the architecture is based on **persistent per-theme profiles**, ensuring that any customization you make is never overwritten or lost when switching themes.
+
 ## Features
 
-- 🎨 **40+ themes with 60+ variants** — Full PowerKit theme library
-- ⚡ **Instant theme switching** — Updates via symlinks, no file regeneration
-- 🔧 **Per-theme customization** — Settings persist across theme changes
-- 🔗 **Symlink architecture** — Static tmux.conf, dynamic theme loading
-- 📦 **Rich plugin ecosystem** — cpu, memory, battery, weather, git, kubernetes, and more
+* 🎨 **40+ themes with 60+ variants** — Full PowerKit theme library
+* ⚡ **Instant theme switching** — Automatic reload on Omarchy theme change
+* 🔧 **Persistent customizations** — Theme configs are permanent and editable
+* 🔗 **Stable architecture** — Static tmux.conf with dynamic profiles
+* 📦 **Rich plugin ecosystem** — CPU, memory, battery, git, weather, and more
+* 🛡️ **Zero overwrites** — Profiles are generated once and never regenerated
+
+## What’s New in v2.1
+
+v2.1 introduces a **persistent profile architecture**:
+
+* Each theme has its own permanent config file
+* Profiles are created once and never overwritten
+* Switching themes updates only a symlink
+* Customizations persist forever
+* Uses Omarchy 3.3+ `theme.name` for reliable detection
+
+> Migrating from v2.0? See the [Migration Guide](/docs/INSTALL.md#migration-from-v20-to-v21)
 
 ## Quick Start
 
-#### 1. Install
+### 1. Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/scripts/omarchy-tmux-install.sh | bash
 ```
 
-#### 2. Inside tmux, install PowerKit
+### 2. Inside tmux, install PowerKit
 
 ```
 prefix + I (Ctrl+b Shift+i)
 ```
 
-#### 3. Switch themes in Omarchy
+### 3. Switch themes in Omarchy
 
 ```
 Super + Ctrl + Shift + Space
 ```
 
-> **Security**: Review the [install script](scripts/omarchy-tmux-install.sh) before running  
-> **Manual**: See [Installation Guide](docs/INSTALL.md)
+### 4. Customize your theme
+
+```bash
+nano ~/.config/tmux/omarchy-current-theme.conf
+```
+
+Your changes persist automatically.
 
 ## Requirements
 
-- [Omarchy Linux](https://omarchy.org) 3.1+ (hooks support)
-- [tmux](https://github.com/tmux/tmux/wiki) 2.9+
-- [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
-- git
+* [Omarchy](https://omarchy.org) 3.3+ (hooks support)
+* [tmux](https://github.com/tmux/tmux/wiki) 2.9+
+* [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
+* git
 
 ## How It Works
 
 ```
-~/.config/tmux/tmux.conf (static)
-    ↓ source-file
-~/.config/omarchy/current/theme/tmux.conf (symlink)
-    ↓ points to
-~/.config/omarchy/themes/ACTIVE_THEME/tmux.conf (generated)
-    ↓ contains
-PowerKit config with theme settings
+tmux.conf (static)
+  ↓
+omarchy-current-theme.conf (symlink)
+  ↓
+omarchy-themes/THEME.conf (persistent profile)
 ```
 
 **On theme change:**
 
-1. Omarchy updates symlink
-2. Hook triggers reload script
-3. tmux sources new config
-4. Theme updates instantly
+1. Omarchy updates `theme.name`
+2. Hook triggers reload
+3. Symlink updates
+4. tmux reloads profile
+
+Your customizations are preserved permanently.
 
 See [How It Works](docs/HOW_IT_WORKS.md) for detailed architecture.
 
@@ -148,30 +172,30 @@ See [How It Works](docs/HOW_IT_WORKS.md) for detailed architecture.
 
 **Fully Supported:**
 
-- Catppuccin (latte, macchiato, frappe, mocha)
-- Rose Pine (dawn, main, moon)
-- Tokyo Night (night, storm, day)
-- Gruvbox (dark, light)
-- Everforest (dark, light)
-- Kanagawa (dragon, lotus)
-- Flexoki (light, dark)
-- Nord, Dracula, Solarized
-- GitHub, Ayu, Material, Monokai
-- OneDark, Atom, Cobalt2, Darcula
-- Horizon, Iceberg, Kiribyte, Molokai
-- Moonlight, Night Owl, Oceanic Next
-- Pastel, Poimandres, Slack, Snazzy
-- Spacegray, Synthwave, Vesper
+* Catppuccin (latte, macchiato, frappe, mocha)
+* Rose Pine (dawn, main, moon)
+* Tokyo Night (night, storm, day)
+* Gruvbox (dark, light)
+* Everforest (dark, light)
+* Kanagawa (dragon, lotus)
+* Flexoki (light, dark)
+* Nord, Dracula, Solarized
+* GitHub, Ayu, Material, Monokai
+* OneDark, Atom, Cobalt2, Darcula
+* Horizon, Iceberg, Kiribyte, Molokai
+* Moonlight, Night Owl, Oceanic Next
+* Pastel, Poimandres, Slack, Snazzy
+* Spacegray, Synthwave, Vesper
 
 **Unsupported (fallback to Tokyo Night):**
 
-- ethereal, hackerman, matte-black, osaka*, ristretto
+* ethereal, hackerman, matte-black, osaka*, ristretto
 
 </details>
 
 ## Customization
 
-Each theme has its own config at `~/.config/omarchy/themes/THEME_NAME/tmux.conf`.
+Each theme has its own config at `~/.config/tmux/omarchy-themes/THEME_NAME.conf`.
 
 ### Quick Examples
 
@@ -200,27 +224,9 @@ See [PowerKit Documentation](https://github.com/fabioluciano/tmux-powerkit) for 
 
 ## Documentation
 
-- 📚 [Installation Guide](docs/INSTALL.md) — Setup, options, and configuration
-- 🔧 [How It Works](docs/HOW_IT_WORKS.md) — Architecture deep dive
-- 🐛 [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and solutions
-
-## Troubleshooting
-
-**Theme not updating?**
-
-```bash
-ls -l ~/.config/omarchy/current/theme  # Check symlink
-cat ~/.config/omarchy/hooks/theme-set  # Check hook
-~/.local/bin/omarchy-tmux-reload       # Test reload
-```
-
-**PowerKit not installed?**
-
-```bash
-Inside tmux, press: prefix + I (Ctrl+b Shift+i)
-```
-
-See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for more help.
+* 📚 [Installation Guide](docs/INSTALL.md) — Setup, options, and configuration
+* 🔧 [How It Works](docs/HOW_IT_WORKS.md) — Architecture deep dive
+* 🐛 [Troubleshooting](docs/TROUBLESHOOTING.md) — Common issues and solutions
 
 ## Uninstall
 
@@ -228,7 +234,13 @@ See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for more help.
 curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/scripts/omarchy-tmux-uninstall.sh | bash
 ```
 
-See [Installation Guide](docs/INSTALL.md#uninstall) for manual steps.
+Options:
+
+```bash
+-k   Keep profiles
+-y   Skip confirmations
+-q   Quiet mode
+```
 
 ## Contributing
 
@@ -243,9 +255,10 @@ Contributions are welcome! Please:
 
 ## Acknowledgments
 
-- [@dhh](https://github.com/dhh) — [Omarchy Linux](https://omarchy.org)
-- [@fabioluciano](https://github.com/fabioluciano) — [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)
-- [@bruno-](https://github.com/bruno-) — [TPM](https://github.com/tmux-plugins/tpm)
+* [@dhh](https://github.com/dhh) — [Omarchy](https://omarchy.org)
+* [@fabioluciano](https://github.com/fabioluciano) — [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)
+* [@bruno-](https://github.com/bruno-) — [TPM](https://github.com/tmux-plugins/tpm)
+* All contributors and users who provided feedback
 
 <div align="center">
 
