@@ -25,13 +25,23 @@ readonly BLUE='\033[0;34m'
 readonly CYAN='\033[0;36m'
 readonly NC='\033[0m'
 
-log() { [[ $QUIET -eq 0 ]] && echo -e "${GREEN}▶${NC} $*"; }
+log() {
+  if [[ $QUIET -eq 0 ]]; then
+    echo -e "${GREEN}▶${NC} $*"
+  fi
+}
+
 warn() { echo -e "${YELLOW}⚠${NC} $*" >&2; }
 error() {
   echo -e "${RED}✗${NC} $*" >&2
   exit 1
 }
-info() { [[ $QUIET -eq 0 ]] && echo -e "${BLUE}ℹ ${NC} $*"; }
+
+info() {
+  if [[ $QUIET -eq 0 ]]; then
+    echo -e "${BLUE}ℹ ${NC} $*"
+  fi
+}
 
 usage() {
   cat <<EOF
