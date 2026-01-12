@@ -166,8 +166,10 @@ remove_hook() {
 
   # If hook file is now empty (except shebang), remove it
   if [[ -f "$HOOK_FILE" ]]; then
-    local line_count=$(grep -cv '^#!/bin/bash' "$HOOK_FILE" 2>/dev/null || echo "0")
-    if [[ $line_count -eq 0 ]]; then
+    local line_count
+    line_count=$(grep -cv '^#!/bin/bash' "$HOOK_FILE" 2>/dev/null || true)
+    line_count="${line_count:-0}"
+    if [[ "$line_count" -eq 0 ]]; then
       rm -f "$HOOK_FILE"
       info "Removed empty hook file"
     fi
