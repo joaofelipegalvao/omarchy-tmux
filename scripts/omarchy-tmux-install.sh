@@ -1,11 +1,11 @@
 #!/bin/bash
-# Omarchy Tmux - PowerKit Configurator (v2.1.0 - True Persistence)
+# Omarchy Tmux - PowerKit Configurator (v2.1.2 - True Persistence)
 # Architecture: Persistent Theme Profiles in ~/.config/tmux/omarchy-themes/
 # https://github.com/joaofelipegalvao/omarchy-tmux
 
 set -euo pipefail
 
-readonly VERSION="2.1.0"
+readonly VERSION="2.1.2"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 readonly RELOAD_SCRIPT="$HOME/.local/bin/omarchy-tmux-reload"
 readonly GENERATOR_SCRIPT="$HOME/.local/bin/omarchy-tmux-generator"
@@ -252,21 +252,33 @@ map_theme() {
     material-lighter)
       base="material"; variant="lighter" ;;
     
-    # Other themes with generic handling
-    monokai*|onedark*|atom*|iceberg*|night-owl*|oceanic-next*|pastel*)
-      base=$(echo "$theme" | cut -d'-' -f1)
-      variant=$(echo "$theme" | cut -s -d'-' -f2-)
-      variant=${variant:-dark}
-      ;;
-    
-    # Unsupported themes (fallback)
-    ethereal|hackerman|matte-black|osaka*|ristretto)
-      base="tokyo-night"; variant="night" ;;
-    
-    # Unknown (fallback)
-    *)
-      base="tokyo-night"; variant="night" ;;
-  esac
+     # Other themes with generic handling
+     monokai*|onedark*|atom*|iceberg*|night-owl*|oceanic-next*|pastel*)
+       base=$(echo "$theme" | cut -d'-' -f1)
+       variant=$(echo "$theme" | cut -s -d'-' -f2-)
+       variant=${variant:-dark}
+       ;;
+     
+     # Ethereal
+     ethereal)
+       base="ethereal"; variant="default" ;;
+     # Osaja-jade
+     osaka-jade)
+       base="osaka-jade"; variant="default" ;;
+     # Hackerman
+     hackerman)
+       base="hackerman"; variant="default" ;;
+     # Mattle-black
+     matte-black)
+       base="matte-black"; variant="default" ;;
+     # Ristretto
+     ristretto)
+       base="ristretto"; variant="default" ;;
+     
+     # Unsupported themes (fallback)
+     *)
+       base="tokyo-night"; variant="night" ;;
+   esac
   
   echo "$base|$variant"
 }
