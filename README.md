@@ -91,6 +91,8 @@ Starting from **v2.1**, the architecture is based on **persistent per-theme prof
 ## Features
 
 * 🎨 **40+ themes with 60+ variants** — Full PowerKit theme library
+* 🔄 **Autodetection** — New Omarchy themes are detected automatically
+* 🎯 **Native support** — All 14 default Omarchy themes synced
 * ⚡ **Instant theme switching** — Automatic reload on Omarchy theme change
 * 🔧 **Persistent customizations** — Theme configs are permanent and editable
 * 🔗 **Stable architecture** — Static tmux.conf with dynamic profiles
@@ -158,8 +160,12 @@ omarchy-themes/THEME.conf (persistent profile)
 
 1. Omarchy updates `theme.name`
 2. Hook triggers reload
-3. Symlink updates
-4. tmux reloads profile
+3. Script detects theme name (any theme, including user-added ones)
+4. Profile created if needed
+5. Symlink updates
+6. tmux reloads profile
+
+**Custom themes work automatically** — When you add a new theme to Omarchy (e.g., `dracula-dark`), simply switch to it via `Super + Ctrl + Shift + Space`. The script detects the theme name automatically and creates a persistent profile at `~/.config/tmux/omarchy-themes/dracula-dark.conf`.
 
 Your customizations are preserved permanently.
 
@@ -186,11 +192,10 @@ See [How It Works](docs/HOW_IT_WORKS.md) for detailed architecture.
 * Moonlight, Night Owl, Oceanic Next
 * Pastel, Poimandres, Slack, Snazzy
 * Spacegray, Synthwave, Vesper
+* Ethereal, Osaka-jade, Hackerman
+* Matte-black, Ristretto
 
-**Unsupported (fallback to Tokyo Night):**
-
-* ethereal, hackerman, matte-black, osaka*, ristretto
-
+**Unsupported (fallback to Tokyo Night)**
 </details>
 
 ## Customization

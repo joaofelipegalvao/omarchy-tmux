@@ -138,7 +138,7 @@ Omarchy Tmux only provides configuration; PowerKit handles presentation.
 ## Theme Switching Flow
 
 ```
-User switches Omarchy theme
+User switches Omarchy theme (any theme, including user-added ones)
         ↓
 Omarchy updates theme.name
         ↓
@@ -146,7 +146,7 @@ Omarchy triggers theme-set hook
         ↓
 Reload script runs
         ↓
-Generator ensures profile exists
+Generator detects theme name and creates profile if needed
         ↓
 Symlink updated to active profile
         ↓
@@ -154,6 +154,18 @@ tmux reloads configuration
         ↓
 PowerKit applies the theme
 ```
+
+### Adding Custom Themes to Omarchy
+
+When you add a new theme to Omarchy (e.g., `dracula-dark`):
+
+1. Add the theme to Omarchy as you normally would
+2. Switch to it via `Super + Ctrl + Shift + Space`
+3. The script automatically detects the theme name
+4. A persistent profile is created at `~/.config/tmux/omarchy-themes/dracula-dark.conf`
+5. Future switches to this theme will use the saved profile
+
+Your customizations to this profile will persist across theme switches.
 
 ---
 
