@@ -2,6 +2,45 @@
 
 All notable changes to Omarchy Tmux will be documented in this file.
 
+# [2.1.3](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v2.1.2...v2.1.3) (2026-01-13)
+
+### Features
+
+* **Full Theme Support**: Added missing theme mappings for 11 themes that previously fell back to Tokyo Night
+* **Theme Mappings Added**: cobalt2, darcula, horizon, kiribyte, molokai, moonlight, poimandres, slack, snazzy, spacegray, vesper
+* **Synthwave Support**: Added synthwave wildcard to properly handle the "84" variant
+
+### Technical Changes
+
+* Updated `map_theme()` function with explicit mappings for all PowerKit themes
+* Now supports all 38 themes from the tmux-powerkit repository
+* Fallback to Tokyo Night only applies to truly unsupported themes
+
+# [2.1.2](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v2.1.1...v2.1.2) (2026-01-12)
+
+### Features
+
+* **Custom Theme Support**: Added dedicated mappings for 5 custom themes ([8df0b0a](https://github.com/joaofelipegalvao/omarchy-tmux/commit/8df0b0ae05458f0ec47fb0d93342e1136f46ac1c))
+  * ethereal → ethereal (default)
+  * osaka-jade → osaka-jade (default)
+  * hackerman → hackerman (default)
+  * matte-black → matte-black (default)
+  * ristretto → ristretto (default)
+
+### Improvements
+
+* Simplified fallback logic - only unknown themes fall back to Tokyo Night
+* Version bumped to 2.1.2
+* Cleaner theme mapping structure
+
+# [2.1.1](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v2.1.0...v2.1.1) (2026-01-11)
+
+### Bug Fixes
+
+* **Quiet Mode Fix**: Fixed log() and info() functions to properly respect the --quiet flag ([7348541](https://github.com/joaofelipegalvao/omarchy-tmux/commit/7348541ad412a208e87ab490c7efe6d34746122b))
+* Fixed issue where one-line function syntax caused premature exit with `set -euo pipefail`
+* Fixed invalid syntax that prevented the script from running correctly
+
 # [2.1.0](https://github.com/joaofelipegalvao/omarchy-tmux/compare/v2.0.0...v2.1.0) (2026-01-10)
 
 ### Features
