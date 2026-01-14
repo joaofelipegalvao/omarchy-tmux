@@ -242,39 +242,85 @@ map_theme() {
     ayu-mirage)
       base="ayu"; variant="mirage" ;;
     
-    # Material variants
-    material|material-default)
-      base="material"; variant="default" ;;
-    material-ocean)
-      base="material"; variant="ocean" ;;
-    material-palenight)
-      base="material"; variant="palenight" ;;
-    material-lighter)
-      base="material"; variant="lighter" ;;
-    
+     # Material variants
+     material|material-default)
+       base="material"; variant="default" ;;
+     material-ocean)
+       base="material"; variant="ocean" ;;
+     material-palenight)
+       base="material"; variant="palenight" ;;
+     material-lighter)
+       base="material"; variant="lighter" ;;
+
+     # Cobalt2
+     cobalt2|cobalt2-default)
+       base="cobalt2"; variant="default" ;;
+
+     # Darcula
+     darcula)
+       base="darcula"; variant="default" ;;
+
+     # Horizon
+     horizon|horizon-default)
+       base="horizon"; variant="default" ;;
+
+     # Kiribyte
+     kiribyte|kiribyte-dark)
+       base="kiribyte"; variant="dark" ;;
+     kiribyte-light)
+       base="kiribyte"; variant="light" ;;
+
+     # Molokai
+     molokai|molokai-dark)
+       base="molokai"; variant="dark" ;;
+
+     # Moonlight
+     moonlight|moonlight-default)
+       base="moonlight"; variant="default" ;;
+
+     # Poimandres
+     poimandres|poimandres-default)
+       base="poimandres"; variant="default" ;;
+
+     # Slack
+     slack|slack-dark)
+       base="slack"; variant="dark" ;;
+
+     # Snazzy
+     snazzy|snazzy-default)
+       base="snazzy"; variant="default" ;;
+
+     # Spacegray
+     spacegray|spacegray-dark)
+       base="spacegray"; variant="dark" ;;
+
+     # Vesper
+     vesper|vesper-default)
+       base="vesper"; variant="default" ;;
+
      # Other themes with generic handling
-     monokai*|onedark*|atom*|iceberg*|night-owl*|oceanic-next*|pastel*)
+     monokai*|onedark*|atom*|iceberg*|night-owl*|oceanic-next*|pastel*|synthwave*)
        base=$(echo "$theme" | cut -d'-' -f1)
        variant=$(echo "$theme" | cut -s -d'-' -f2-)
        variant=${variant:-dark}
        ;;
-     
+
      # Ethereal
      ethereal)
        base="ethereal"; variant="default" ;;
-     # Osaja-jade
+     # Osaka Jade
      osaka-jade)
        base="osaka-jade"; variant="default" ;;
      # Hackerman
      hackerman)
        base="hackerman"; variant="default" ;;
-     # Mattle-black
+     # Matte Black
      matte-black)
        base="matte-black"; variant="default" ;;
-     # Ristretto
+    # Ristretto
      ristretto)
        base="ristretto"; variant="default" ;;
-     
+
      # Unsupported themes (fallback)
      *)
        base="tokyo-night"; variant="night" ;;
