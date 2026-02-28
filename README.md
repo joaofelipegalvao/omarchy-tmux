@@ -13,14 +13,49 @@
 </p>
 
 <div align="center">
-  
-**Seamless [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) integration for [Omarchy](https://omarchy.org)**
 
-**17 themes · Instant switching · TPM optional**
+**Seamless [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) integration for [Omarchy](https://omarchy.org)**  
 
-<p align="center"><em>tmux updates automatically when switching Omarchy themes with <code>Super + Ctrl + Shift + Space</code></em></p>
+**17 themes · Instant switching**
 
 </div>
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="assets/tokyo-night.png" width="320" />
+        <br/><sub><b>Tokyo Night</b></sub>
+      </td>
+      <td align="center">
+        <img src="assets/gruvbox.png" width="320" />
+        <br/><sub><b>Gruvbox</b></sub>
+      </td>
+      <td align="center">
+        <img src="assets/catppuccin-macchiato.png" width="320" />
+        <br/><sub><b>Catppuccin Macchiato</b></sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="assets/white.png" width="320" />
+        <br/><sub><b>White</b></sub>
+      </td>
+      <td align="center">
+        <img src="assets/catppuccin-latte.png" width="320" />
+        <br/><sub><b>Catppuccin Latte</b></sub>
+      </td>
+      <td align="center">
+        <img src="assets/rose-pine.png" width="320" />
+        <br/><sub><b>Rose Pine</b></sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p align="center">
+<em>tmux updates automatically when switching Omarchy themes with <code>Super + Ctrl + Shift + Space</code></em>
+</p>
 
 ## Install
 
@@ -167,8 +202,6 @@ curl -fsSL https://raw.githubusercontent.com/joaofelipegalvao/omarchy-tmux/main/
 
 * [@dhh](https://github.com/dhh) — [Omarchy](https://omarchy.org)
 * [@fabioluciano](https://github.com/fabioluciano) — [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit)
-* [@bruno-](https://github.com/bruno-) — [TPM](https://github.com/tmux-plugins/tpm)
-* All contributors and users who provided feedback
 
 <div align="center">
 
