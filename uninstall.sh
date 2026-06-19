@@ -24,8 +24,12 @@ warn() { echo -e "${YELLOW}⚠${NC} $*" >&2; }
 
 confirm() {
   [[ $YES -eq 1 ]] && return 0
+  if [[ ! -t 0 && ! -e /dev/tty ]]; then
+    warn "No interactive terminal available, skipping confirmation requires -y"
+    return 1
+  fi
   echo -ne "${YELLOW}?${NC} $1 [y/N]: "
-  read -r response
+  read -r response </dev/tty
   [[ "$response" =~ ^[Yy]$ ]]
 }
 
@@ -37,9 +41,7 @@ remove_from_tmux_conf() {
   cp "$TMUX_CONF" "${TMUX_CONF}.backup-uninstall-$(date +%Y%m%d-%H%M%S)"
 
   # Remove omarchy-tmux block
-  sed -i '/# omarchy-tmux/,/run-shell.*tmux-powerkit/d' "$TMUX_CONF" 2>/dev/null || true
-  # Remove leftover powerkit-theme source line
-  sed -i '\|powerkit-theme.conf|d' "$TMUX_CONF" 2>/dev/null || true
+  sed -i '/# >>> omarchy-tmux/,/# <<< omarchy-tmux/d' "$TMUX_CONF" 2>/dev/null || true
 }
 
 remove_script() {
@@ -58,18 +60,11 @@ remove_hooks() {
   # theme-set hook
   if [[ -f "$THEME_SET_HOOK" ]]; then
     sed -i '\|omarchy-tmux-theme-set|d' "$THEME_SET_HOOK" 2>/dev/null || true
-    # Remove if empty (only shebang left)
-    local lines
-    lines=$(grep -cv '^#' "$THEME_SET_HOOK" 2>/dev/null || echo 0)
-    [[ "$lines" -eq 0 ]] && rm -f "$THEME_SET_HOOK"
   fi
 
   # post-update hook
   if [[ -f "$POST_UPDATE_HOOK" ]]; then
-    sed -i '/# omarchy-tmux/,/tmux-powerkit/d' "$POST_UPDATE_HOOK" 2>/dev/null || true
-    local lines
-    lines=$(grep -cv '^#' "$POST_UPDATE_HOOK" 2>/dev/null || echo 0)
-    [[ "$lines" -eq 0 ]] && rm -f "$POST_UPDATE_HOOK"
+    sed -i '/# >>> omarchy-tmux/,/# <<< omarchy-tmux/d' "$POST_UPDATE_HOOK" 2>/dev/null || true
   fi
 }
 
