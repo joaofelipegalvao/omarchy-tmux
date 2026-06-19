@@ -5,12 +5,10 @@
 set -euo pipefail
 
 readonly POWERKIT_DIR="$HOME/.config/tmux/plugins/tmux-powerkit"
-readonly POWERKIT_THEME_CONF="$HOME/.config/tmux/powerkit-theme.conf"
 readonly THEME_SET_SCRIPT="$HOME/.local/bin/omarchy-tmux-theme-set"
 readonly THEME_SET_HOOK="$HOME/.config/omarchy/hooks/theme-set"
 readonly POST_UPDATE_HOOK="$HOME/.config/omarchy/hooks/post-update"
 readonly TMUX_CONF="$HOME/.config/tmux/tmux.conf"
-readonly OMARCHY_THEME_NAME="$HOME/.config/omarchy/current/theme.name"
 
 # Colors
 readonly RED='\033[0;31m'
@@ -26,91 +24,7 @@ error() {
   exit 1
 }
 
-# ---------------------------------------------------------------------------
-# Theme mapping
-# ---------------------------------------------------------------------------
-map_theme() {
-  local theme="$1"
-  local base="tokyo-night"
-  local variant="night"
-
-  case "$theme" in
-  catppuccin-latte)
-    base="catppuccin"
-    variant="latte"
-    ;;
-  catppuccin)
-    base="catppuccin"
-    variant="mocha"
-    ;;
-  ethereal)
-    base="ethereal"
-    variant="default"
-    ;;
-  everforest)
-    base="everforest"
-    variant="dark"
-    ;;
-  flexoki-light)
-    base="flexoki"
-    variant="light"
-    ;;
-  gruvbox)
-    base="gruvbox"
-    variant="dark"
-    ;;
-  hackerman)
-    base="hackerman"
-    variant="default"
-    ;;
-  kanagawa)
-    base="kanagawa"
-    variant="dragon"
-    ;;
-  matte-black)
-    base="matte-black"
-    variant="default"
-    ;;
-  miasma)
-    base="miasma"
-    variant="default"
-    ;;
-  nord)
-    base="nord"
-    variant="dark"
-    ;;
-  osaka-jade)
-    base="osaka-jade"
-    variant="default"
-    ;;
-  ristretto)
-    base="ristretto"
-    variant="default"
-    ;;
-  rose-pine)
-    base="rose-pine"
-    variant="main"
-    ;;
-  tokyo-night)
-    base="tokyo-night"
-    variant="night"
-    ;;
-  vantablack)
-    base="vantablack"
-    variant="default"
-    ;;
-  white)
-    base="white"
-    variant="default"
-    ;;
-  *)
-    base="tokyo-night"
-    variant="night"
-    ;;
-  esac
-
-  echo "$base|$variant"
-}
+trap 'echo -e "${RED}✗ Installation failed.${NC} Check the error above for details." >&2' ERR
 
 # ---------------------------------------------------------------------------
 # Check dependencies
@@ -214,7 +128,7 @@ configure_tmux() {
   touch "$TMUX_CONF"
 
   # Check if already configured
-  if grep -q "powerkit-theme.conf" "$TMUX_CONF" 2>/dev/null; then
+  if grep -q "# >>> omarchy-tmux" "$TMUX_CONF" 2>/dev/null; then
     log "tmux.conf already configured"
     return 0
   fi
@@ -239,32 +153,43 @@ configure_tmux() {
   fi
 
   if [[ $has_tpm -eq 1 ]]; then
-    # TPM user: add theme loader before the TPM run line
-    sed -i "\|run.*tpm/tpm|i # Load omarchy-tmux theme\nif-shell \"[ -f ~/.config/tmux/powerkit-theme.conf ]\" \"source-file ~/.config/tmux/powerkit-theme.conf\"\n" \
-      "$TMUX_CONF" 2>/dev/null || true
+    # TPM user: insert theme loader block before the TPM run line
+    awk '
+      /run.*tpm\/tpm/ && !done {
+        print "# >>> omarchy-tmux — do not edit >>>"
+        print "if-shell \"[ -f ~/.config/tmux/powerkit-theme.conf ]\" \\"
+        print "  \"source-file ~/.config/tmux/powerkit-theme.conf\""
+        print "# <<< omarchy-tmux <<<"
+        print ""
+        done=1
+      }
+      { print }
+    ' "$TMUX_CONF" >"${TMUX_CONF}.tmp" && mv "${TMUX_CONF}.tmp" "$TMUX_CONF"
+
     if [[ $has_powerkit_plugin -eq 0 ]]; then
       warn "Add 'set -g @plugin fabioluciano/tmux-powerkit' to your tmux.conf and press prefix + I"
     fi
   else
-    # No TPM: add theme loader
-    # Only add run-shell if powerkit not already declared
+    # No TPM: append theme loader
     if [[ $has_powerkit_plugin -eq 1 ]]; then
       cat >>"$TMUX_CONF" <<'EOF'
 
-# omarchy-tmux — load powerkit theme
+# >>> omarchy-tmux — do not edit >>>
 if-shell "[ -f ~/.config/tmux/powerkit-theme.conf ]" \
   "source-file ~/.config/tmux/powerkit-theme.conf"
+# <<< omarchy-tmux <
 EOF
     else
       cat >>"$TMUX_CONF" <<'EOF'
 
-# omarchy-tmux — load powerkit theme
+# >>> omarchy-tmux — do not edit >>>
 if-shell "[ -f ~/.config/tmux/powerkit-theme.conf ]" \
   "source-file ~/.config/tmux/powerkit-theme.conf"
 
 # Load powerkit plugin
 if-shell "[ -f ~/.config/tmux/plugins/tmux-powerkit/tmux-powerkit.tmux ]" \
   "run-shell ~/.config/tmux/plugins/tmux-powerkit/tmux-powerkit.tmux"
+# <<< omarchy-tmux <
 EOF
     fi
   fi
@@ -301,11 +226,11 @@ install_hooks() {
 
   if ! grep -q "tmux-powerkit" "$POST_UPDATE_HOOK" 2>/dev/null; then
     cat >>"$POST_UPDATE_HOOK" <<'EOF'
-
-# omarchy-tmux — update tmux-powerkit
+# >>> omarchy-tmux — do not edit >>>
 if [[ -d "$HOME/.config/tmux/plugins/tmux-powerkit/.git" ]]; then
   git -C "$HOME/.config/tmux/plugins/tmux-powerkit" pull --ff-only
 fi
+# <<< omarchy-tmux <
 EOF
     log "post-update hook installed"
   else
